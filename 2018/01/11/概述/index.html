@@ -81,17 +81,17 @@
 
 
 
-<meta name="description" content="Welcome to Hexo! This is your very first post. Check documentation for more info. If you get any problems when using Hexo, you can find the answer in troubleshooting or you can ask me on GitHub. Quick">
+<meta name="description" content="概要2015年是Android插件化技术突飞猛进的一年，随着业务的发展各大厂商都碰到了Android Native平台的瓶颈：  从技术上讲，业务逻辑的复杂导致代码量急剧膨胀，各大厂商陆续出到65535方法数的天花板；同时，运营为王的时代对于模块热更新提出了更高的要求。 在业务层面上，功能模块的解耦以及维护团队的分离也是大势所趋；各个团队维护着同一个App的不同模块，如果每个模块升级新功能都需要对">
 <meta property="og:type" content="article">
-<meta property="og:title" content="Hello World">
-<meta property="og:url" content="https://zhanqq2010.github.io/2018/01/10/hello-world/index.html">
+<meta property="og:title" content="Android插件化原理解析——概要">
+<meta property="og:url" content="https://zhanqq2010.github.io/2018/01/11/概述/index.html">
 <meta property="og:site_name" content="zhanqq&#39;s Notes">
-<meta property="og:description" content="Welcome to Hexo! This is your very first post. Check documentation for more info. If you get any problems when using Hexo, you can find the answer in troubleshooting or you can ask me on GitHub. Quick">
+<meta property="og:description" content="概要2015年是Android插件化技术突飞猛进的一年，随着业务的发展各大厂商都碰到了Android Native平台的瓶颈：  从技术上讲，业务逻辑的复杂导致代码量急剧膨胀，各大厂商陆续出到65535方法数的天花板；同时，运营为王的时代对于模块热更新提出了更高的要求。 在业务层面上，功能模块的解耦以及维护团队的分离也是大势所趋；各个团队维护着同一个App的不同模块，如果每个模块升级新功能都需要对">
 <meta property="og:locale" content="zh-Hans">
-<meta property="og:updated_time" content="2018-01-10T02:20:33.968Z">
+<meta property="og:updated_time" content="2018-01-11T04:01:28.790Z">
 <meta name="twitter:card" content="summary">
-<meta name="twitter:title" content="Hello World">
-<meta name="twitter:description" content="Welcome to Hexo! This is your very first post. Check documentation for more info. If you get any problems when using Hexo, you can find the answer in troubleshooting or you can ask me on GitHub. Quick">
+<meta name="twitter:title" content="Android插件化原理解析——概要">
+<meta name="twitter:description" content="概要2015年是Android插件化技术突飞猛进的一年，随着业务的发展各大厂商都碰到了Android Native平台的瓶颈：  从技术上讲，业务逻辑的复杂导致代码量急剧膨胀，各大厂商陆续出到65535方法数的天花板；同时，运营为王的时代对于模块热更新提出了更高的要求。 在业务层面上，功能模块的解耦以及维护团队的分离也是大势所趋；各个团队维护着同一个App的不同模块，如果每个模块升级新功能都需要对">
 
 
 
@@ -121,13 +121,13 @@
 
 
 
-  <link rel="canonical" href="https://zhanqq2010.github.io/2018/01/10/hello-world/"/>
+  <link rel="canonical" href="https://zhanqq2010.github.io/2018/01/11/概述/"/>
 
 
 
 
 
-  <title>Hello World | zhanqq's Notes</title>
+  <title>Android插件化原理解析——概要 | zhanqq's Notes</title>
   
 
 
@@ -235,7 +235,7 @@
   
   
   <div class="post-block">
-    <link itemprop="mainEntityOfPage" href="https://zhanqq2010.github.io/QQzzZ.github.io/2018/01/10/hello-world/">
+    <link itemprop="mainEntityOfPage" href="https://zhanqq2010.github.io/QQzzZ.github.io/2018/01/11/概述/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
       <meta itemprop="name" content="QQzzZ">
@@ -252,7 +252,7 @@
 
         
         
-          <h1 class="post-title" itemprop="name headline">Hello World</h1>
+          <h1 class="post-title" itemprop="name headline">Android插件化原理解析——概要</h1>
         
 
         <div class="post-meta">
@@ -264,8 +264,8 @@
               
                 <span class="post-meta-item-text">发表于</span>
               
-              <time title="创建于" itemprop="dateCreated datePublished" datetime="2018-01-10T10:20:33+08:00">
-                2018-01-10
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2018-01-11T11:53:35+08:00">
+                2018-01-11
               </time>
             
 
@@ -302,15 +302,38 @@
       
 
       
-        <p>Welcome to <a href="https://hexo.io/" target="_blank" rel="noopener">Hexo</a>! This is your very first post. Check <a href="https://hexo.io/docs/" target="_blank" rel="noopener">documentation</a> for more info. If you get any problems when using Hexo, you can find the answer in <a href="https://hexo.io/docs/troubleshooting.html" target="_blank" rel="noopener">troubleshooting</a> or you can ask me on <a href="https://github.com/hexojs/hexo/issues" target="_blank" rel="noopener">GitHub</a>.</p>
-<h2 id="Quick-Start"><a href="#Quick-Start" class="headerlink" title="Quick Start"></a>Quick Start</h2><h3 id="Create-a-new-post"><a href="#Create-a-new-post" class="headerlink" title="Create a new post"></a>Create a new post</h3><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">$ hexo new <span class="string">"My New Post"</span></span><br></pre></td></tr></table></figure>
-<p>More info: <a href="https://hexo.io/docs/writing.html" target="_blank" rel="noopener">Writing</a></p>
-<h3 id="Run-server"><a href="#Run-server" class="headerlink" title="Run server"></a>Run server</h3><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">$ hexo server</span><br></pre></td></tr></table></figure>
-<p>More info: <a href="https://hexo.io/docs/server.html" target="_blank" rel="noopener">Server</a></p>
-<h3 id="Generate-static-files"><a href="#Generate-static-files" class="headerlink" title="Generate static files"></a>Generate static files</h3><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">$ hexo generate</span><br></pre></td></tr></table></figure>
-<p>More info: <a href="https://hexo.io/docs/generating.html" target="_blank" rel="noopener">Generating</a></p>
-<h3 id="Deploy-to-remote-sites"><a href="#Deploy-to-remote-sites" class="headerlink" title="Deploy to remote sites"></a>Deploy to remote sites</h3><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">$ hexo deploy</span><br></pre></td></tr></table></figure>
-<p>More info: <a href="https://hexo.io/docs/deployment.html" target="_blank" rel="noopener">Deployment</a></p>
+        <h1 id="概要"><a href="#概要" class="headerlink" title="概要"></a>概要</h1><p>2015年是Android插件化技术突飞猛进的一年，随着业务的发展各大厂商都碰到了Android Native平台的瓶颈：</p>
+<ol>
+<li>从技术上讲，业务逻辑的复杂导致代码量急剧膨胀，各大厂商陆续出到65535方法数的天花板；同时，运营为王的时代对于模块热更新提出了更高的要求。</li>
+<li>在业务层面上，功能模块的解耦以及维护团队的分离也是大势所趋；各个团队维护着同一个App的不同模块，如果每个模块升级新功能都需要对整个app进行升级，那么发布流程不仅复杂而且效率低下；在讲究小步快跑和持续迭代的移动互联网必将遭到淘汰。</li>
+</ol>
+<p>H5和Hybird可以解决这些问题，但是始终比不上native的用户体验；于是，国外的FaceBook推出了<code>react-native</code>；而国内各大厂商几乎都选择纯native的插件化技术。可以说，Android的未来必将是<code>react-native</code>和插件化的天下。</p>
+<a id="more"></a>
+<p><code>react-native</code>资料很多，但是讲述插件化的却凤毛菱角；插件化技术听起来高深莫测，实际上要解决的就是两个问题：</p>
+<ol>
+<li>代码加载</li>
+<li>资源加载</li>
+</ol>
+<h2 id="代码加载"><a href="#代码加载" class="headerlink" title="代码加载"></a>代码加载</h2><p>类的加载可以使用Java的<code>ClassLoader</code>机制，但是对于Android来说，并不是说类加载进来就可以用了，很多组件都是有“生命”的；因此对于这些有血有肉的类，必须给它们注入活力，也就是所谓的<strong>组件生命周期管理</strong>；</p>
+<p>另外，如何管理加载进来的类也是一个问题。假设多个插件依赖了相同的类，是抽取公共依赖进行管理还是插件单独依赖？这就是<strong>ClassLoader的管理问题</strong>；</p>
+<h2 id="资源加载"><a href="#资源加载" class="headerlink" title="资源加载"></a>资源加载</h2><p>资源加载方案大家使用的原理都差不多，都是用<code>AssetManager</code>的隐藏方法<code>addAssetPath</code>；但是，不同插件的资源如何管理？是公用一套资源还是插件独立资源？共用资源如何避免资源冲突？对于资源加载，有的方案共用一套资源并采用资源分段机制解决冲突（要么修改<code>aapt</code>要么添加编译插件）；有的方案选择独立资源，不同插件管理自己的资源。</p>
+<p>目前国内开源的较成熟的插件方案有<a href="https://github.com/singwhatiwanna/dynamic-load-apk" target="_blank" rel="noopener">DL</a>和<a href="https://github.com/Qihoo360/DroidPlugin" target="_blank" rel="noopener">DroidPlugin</a>；但是DL方案仅仅对Frameworl的表层做了处理，严重依赖<code>that</code>语法，编写插件代码和主程序代码需单独区分；而DroidPlugin通过Hook增强了Framework层的很多系统服务，开发插件就跟开发独立app差不多；就拿Activity生命周期的管理来说，DL的代理方式就像是牵线木偶，插件只不过是操纵傀儡而已；而DroidPlugin则是借尸还魂，插件是有血有肉的系统管理的真正组件；DroidPlugin Hook了系统几乎所有的Sevice，欺骗了大部分的系统API；掌握这个Hook过程需要掌握很多系统原理，因此学习DroidPlugin对于整个Android FrameWork层大有裨益。</p>
+<p>接下来的一系列文章将以DroidPlugin为例讲解插件框架的原理，揭开插件化的神秘面纱；同时还能帮助深入理解Android Framewrok；主要内容如下：</p>
+<ul>
+<li><a href="Hook机制之代理Hook.md">Hook机制之动态代理</a></li>
+<li><a href="Hook机制之Binder-Hook.md">Hook机制之Binder Hook</a></li>
+<li><a href="Hook机制之AMS&amp;PMS.md">Hook机制之AMS&amp;PMS</a></li>
+<li><a href="Activity生命周期管理.md">Activity生命周期管理</a></li>
+<li><a href="ClassLoader管理.md">插件加载机制</a></li>
+<li><a href="BroadcastReceiver插件化.md">广播的管理方式</a></li>
+<li><a href="Service插件化.md">Service的插件化</a></li>
+<li><a href="ContentProvider插件化.md">ContentProvider的插件化</a></li>
+<li>DroidPlugin插件通信机制</li>
+<li>插件机制之资源管理</li>
+<li>不同插件框架方案对比</li>
+<li>插件化的未来</li>
+</ul>
+<p>另外，对于每一章内容都会有详细的demo，具体见<a href="https://github.com/tiann/understand-plugin-framework" target="_blank" rel="noopener">understand-plugin-framework</a>；喜欢就点个关注吧～</p>
 
       
     </div>
@@ -335,14 +358,18 @@
         <div class="post-nav">
           <div class="post-nav-next post-nav-item">
             
+              <a href="/QQzzZ.github.io/2018/01/10/hello-world/" rel="next" title="Hello World">
+                <i class="fa fa-chevron-left"></i> Hello World
+              </a>
+            
           </div>
 
           <span class="post-nav-divider"></span>
 
           <div class="post-nav-prev post-nav-item">
             
-              <a href="/QQzzZ.github.io/2018/01/11/概述/" rel="prev" title="Android插件化原理解析——概要">
-                Android插件化原理解析——概要 <i class="fa fa-chevron-right"></i>
+              <a href="/QQzzZ.github.io/2018/01/11/Activity生命周期管理/" rel="prev" title="Android插件化原理解析——Activity生命周期管理">
+                Android插件化原理解析——Activity生命周期管理 <i class="fa fa-chevron-right"></i>
               </a>
             
           </div>
@@ -468,7 +495,7 @@
             
 
             
-              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#Quick-Start"><span class="nav-number">1.</span> <span class="nav-text">Quick Start</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#Create-a-new-post"><span class="nav-number">1.1.</span> <span class="nav-text">Create a new post</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Run-server"><span class="nav-number">1.2.</span> <span class="nav-text">Run server</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Generate-static-files"><span class="nav-number">1.3.</span> <span class="nav-text">Generate static files</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Deploy-to-remote-sites"><span class="nav-number">1.4.</span> <span class="nav-text">Deploy to remote sites</span></a></li></ol></li></ol></div>
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#概要"><span class="nav-number">1.</span> <span class="nav-text">概要</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#代码加载"><span class="nav-number">1.1.</span> <span class="nav-text">代码加载</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#资源加载"><span class="nav-number">1.2.</span> <span class="nav-text">资源加载</span></a></li></ol></li></ol></div>
             
 
           </div>
