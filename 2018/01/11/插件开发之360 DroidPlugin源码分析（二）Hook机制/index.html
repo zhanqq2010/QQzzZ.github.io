@@ -81,17 +81,32 @@
 
 
 
-<meta name="description" content="Welcome to Hexo! This is your very first post. Check documentation for more info. If you get any problems when using Hexo, you can find the answer in troubleshooting or you can ask me on GitHub. Quick">
+<meta name="description" content="前言：新插件的开发，可以说是为插件开发者带来了福音，虽然还很多坑要填补，对于这款牛逼的插件机制，一直想找个时间分析和总结下它的code，话不多说，直接入正题，本文是分析../hook/handle及../hook/proxy下代码，../hook/binder单独分析  Hook机制的包结构关系 Hook机制的类图关系 Hook机制的时序图关系 Manifest权制申请 基类Hook做了什么？ H">
 <meta property="og:type" content="article">
-<meta property="og:title" content="Hello World">
-<meta property="og:url" content="https://zhanqq2010.github.io/2018/01/10/hello-world/index.html">
+<meta property="og:title" content="插件开发之360 DroidPlugin源码分析（二）Hook机制">
+<meta property="og:url" content="https://zhanqq2010.github.io/2018/01/11/插件开发之360 DroidPlugin源码分析（二）Hook机制/index.html">
 <meta property="og:site_name" content="zhanqq&#39;s Notes">
-<meta property="og:description" content="Welcome to Hexo! This is your very first post. Check documentation for more info. If you get any problems when using Hexo, you can find the answer in troubleshooting or you can ask me on GitHub. Quick">
+<meta property="og:description" content="前言：新插件的开发，可以说是为插件开发者带来了福音，虽然还很多坑要填补，对于这款牛逼的插件机制，一直想找个时间分析和总结下它的code，话不多说，直接入正题，本文是分析../hook/handle及../hook/proxy下代码，../hook/binder单独分析  Hook机制的包结构关系 Hook机制的类图关系 Hook机制的时序图关系 Manifest权制申请 基类Hook做了什么？ H">
 <meta property="og:locale" content="zh-Hans">
-<meta property="og:updated_time" content="2018-01-10T02:20:33.968Z">
+<meta property="og:image" content="http://img.blog.csdn.net/20160804225345196">
+<meta property="og:image" content="http://img.blog.csdn.net/20160804223440825">
+<meta property="og:image" content="http://img.blog.csdn.net/20160804231948003">
+<meta property="og:image" content="http://img.blog.csdn.net/20160804223958687">
+<meta property="og:image" content="http://img.blog.csdn.net/20160804224026000">
+<meta property="og:image" content="http://img.blog.csdn.net/20160804224240240">
+<meta property="og:image" content="http://img.blog.csdn.net/20160804224830919">
+<meta property="og:image" content="http://img.blog.csdn.net/20160804224623385">
+<meta property="og:image" content="http://img.blog.csdn.net/20160804224710183">
+<meta property="og:image" content="http://img.blog.csdn.net/20160804224440227">
+<meta property="og:image" content="http://img.blog.csdn.net/20160804232212379">
+<meta property="og:image" content="http://img.blog.csdn.net/20160804225003968">
+<meta property="og:image" content="http://img.blog.csdn.net/20160804225111866">
+<meta property="og:image" content="http://img.blog.csdn.net/20160804232822115">
+<meta property="og:updated_time" content="2018-01-11T06:09:06.974Z">
 <meta name="twitter:card" content="summary">
-<meta name="twitter:title" content="Hello World">
-<meta name="twitter:description" content="Welcome to Hexo! This is your very first post. Check documentation for more info. If you get any problems when using Hexo, you can find the answer in troubleshooting or you can ask me on GitHub. Quick">
+<meta name="twitter:title" content="插件开发之360 DroidPlugin源码分析（二）Hook机制">
+<meta name="twitter:description" content="前言：新插件的开发，可以说是为插件开发者带来了福音，虽然还很多坑要填补，对于这款牛逼的插件机制，一直想找个时间分析和总结下它的code，话不多说，直接入正题，本文是分析../hook/handle及../hook/proxy下代码，../hook/binder单独分析  Hook机制的包结构关系 Hook机制的类图关系 Hook机制的时序图关系 Manifest权制申请 基类Hook做了什么？ H">
+<meta name="twitter:image" content="http://img.blog.csdn.net/20160804225345196">
 
 
 
@@ -121,13 +136,13 @@
 
 
 
-  <link rel="canonical" href="https://zhanqq2010.github.io/2018/01/10/hello-world/"/>
+  <link rel="canonical" href="https://zhanqq2010.github.io/2018/01/11/插件开发之360 DroidPlugin源码分析（二）Hook机制/"/>
 
 
 
 
 
-  <title>Hello World | zhanqq's Notes</title>
+  <title>插件开发之360 DroidPlugin源码分析（二）Hook机制 | zhanqq's Notes</title>
   
 
 
@@ -235,7 +250,7 @@
   
   
   <div class="post-block">
-    <link itemprop="mainEntityOfPage" href="https://zhanqq2010.github.io/QQzzZ.github.io/2018/01/10/hello-world/">
+    <link itemprop="mainEntityOfPage" href="https://zhanqq2010.github.io/QQzzZ.github.io/2018/01/11/插件开发之360 DroidPlugin源码分析（二）Hook机制/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
       <meta itemprop="name" content="QQzzZ">
@@ -252,7 +267,7 @@
 
         
         
-          <h1 class="post-title" itemprop="name headline">Hello World</h1>
+          <h1 class="post-title" itemprop="name headline">插件开发之360 DroidPlugin源码分析（二）Hook机制</h1>
         
 
         <div class="post-meta">
@@ -264,8 +279,8 @@
               
                 <span class="post-meta-item-text">发表于</span>
               
-              <time title="创建于" itemprop="dateCreated datePublished" datetime="2018-01-10T10:20:33+08:00">
-                2018-01-10
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2018-01-11T14:08:33+08:00">
+                2018-01-11
               </time>
             
 
@@ -302,15 +317,34 @@
       
 
       
-        <p>Welcome to <a href="https://hexo.io/" target="_blank" rel="noopener">Hexo</a>! This is your very first post. Check <a href="https://hexo.io/docs/" target="_blank" rel="noopener">documentation</a> for more info. If you get any problems when using Hexo, you can find the answer in <a href="https://hexo.io/docs/troubleshooting.html" target="_blank" rel="noopener">troubleshooting</a> or you can ask me on <a href="https://github.com/hexojs/hexo/issues" target="_blank" rel="noopener">GitHub</a>.</p>
-<h2 id="Quick-Start"><a href="#Quick-Start" class="headerlink" title="Quick Start"></a>Quick Start</h2><h3 id="Create-a-new-post"><a href="#Create-a-new-post" class="headerlink" title="Create a new post"></a>Create a new post</h3><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">$ hexo new <span class="string">"My New Post"</span></span><br></pre></td></tr></table></figure>
-<p>More info: <a href="https://hexo.io/docs/writing.html" target="_blank" rel="noopener">Writing</a></p>
-<h3 id="Run-server"><a href="#Run-server" class="headerlink" title="Run server"></a>Run server</h3><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">$ hexo server</span><br></pre></td></tr></table></figure>
-<p>More info: <a href="https://hexo.io/docs/server.html" target="_blank" rel="noopener">Server</a></p>
-<h3 id="Generate-static-files"><a href="#Generate-static-files" class="headerlink" title="Generate static files"></a>Generate static files</h3><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">$ hexo generate</span><br></pre></td></tr></table></figure>
-<p>More info: <a href="https://hexo.io/docs/generating.html" target="_blank" rel="noopener">Generating</a></p>
-<h3 id="Deploy-to-remote-sites"><a href="#Deploy-to-remote-sites" class="headerlink" title="Deploy to remote sites"></a>Deploy to remote sites</h3><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">$ hexo deploy</span><br></pre></td></tr></table></figure>
-<p>More info: <a href="https://hexo.io/docs/deployment.html" target="_blank" rel="noopener">Deployment</a></p>
+        <p>前言：新插件的开发，可以说是为插件开发者带来了福音，虽然还很多坑要填补，对于这款牛逼的插件机制，一直想找个时间分析和总结下它的code，话不多说，直接入正题，本文是分析../hook/handle及../hook/proxy下代码，../hook/binder单独分析</p>
+<ul>
+<li><strong>Hook机制的包结构关系</strong></li>
+<li><strong>Hook机制的类图关系</strong></li>
+<li><strong>Hook机制的时序图关系</strong></li>
+<li><strong>Manifest权制申请</strong></li>
+<li><strong>基类Hook做了什么？</strong></li>
+<li><strong>HookedMethodHandler</strong></li>
+<li><strong>基类BaseHookHandle和Hook有什么关系？</strong></li>
+<li><strong>ProxyHook能干什么？</strong></li>
+<li><strong>实例-如何hook IPackageManager</strong></li>
+</ul>
+<p>##Hook机制的包结构关系<br><img src="http://img.blog.csdn.net/20160804225345196" alt="这里写图片描述"></p>
+<p>##Hook机制类图关系<br><img src="http://img.blog.csdn.net/20160804223440825" alt="这里写图片描述"><br>首先定义了一个基类Hook，抽象类，外部可以通过setEnable()方法来使能否hook。声明了onInstall和onUnInstall及相关的方法，子类可以覆盖这些方法完成相应的车间机床,这里相当于提供一个车间，机床上的具体操作什么由子类去自己实现。</p>
+<p>##Hook机制的时序图关系<br><img src="http://img.blog.csdn.net/20160804231948003" alt="这里写图片描述"></p>
+<p>##Manifest权限申请<br>插件管理服务类声明：<br><img src="http://img.blog.csdn.net/20160804223958687" alt="这里写图片描述"></p>
+<p>权限申请：<br><img src="http://img.blog.csdn.net/20160804224026000" alt="这里写图片描述"></p>
+<p>##基类Hook做了什么？<br><img src="http://img.blog.csdn.net/20160804224240240" alt="这里写图片描述"></p>
+<p>##ProxyHook<br><img src="http://img.blog.csdn.net/20160804224830919" alt="这里写图片描述"></p>
+<p>ProxyHook继承自Hook，实现了InvocationHandler接口。它有一个setOldObj()方法，用来保存原始对象。新的代理对象可以看到在代码中是如何实现的（动态代理）</p>
+<p>##BaseHookHandle<br><img src="http://img.blog.csdn.net/20160804224623385" alt="这里写图片描述"></p>
+<p><img src="http://img.blog.csdn.net/20160804224710183" alt="这里写图片描述"><br>接上面ProxyHook中的invoke()方法，mHookHandles是一个BaseHookHandle对象，内部包含了一个Map，可以根据API名映射到对应对应的HookedMethodHandler对象。这个Map由其子类IXXXHookHandle在初始化的时候进行填充。<br>紧接着调用HookedMethodHandler的doHookInner()方法：</p>
+<p>##HookedMethodHandler<br><img src="http://img.blog.csdn.net/20160804224440227" alt="这里写图片描述"></p>
+<p>##ReplaceCallingPackageHookedMethodHandler<br><img src="http://img.blog.csdn.net/20160804232212379" alt="这里写图片描述"></p>
+<p>##IO重定向<br><img src="http://img.blog.csdn.net/20160804225003968" alt="这里写图片描述"></p>
+<p>##递归遍历<br><img src="http://img.blog.csdn.net/20160804225111866" alt="这里写图片描述"></p>
+<p>##以IPackageManager为例<br>IPackageManagerHook：Hook所有IPackageManager的方法<br>IActivityManagerHookHandle：安装所有被Hook的方法的处理对象，加入到Map中<br>IPackageManagerHandle.checkSignatures：这是一个内部类，继承HookedMethodHandler, 专门校验签名的。以此，还有各种各样的PackageManger原生中的方法，在这都变成了一个内部类继承了HookedMethodHandler.上图：<br>IPackageManagerHookHandle：</p>
+<p><img src="http://img.blog.csdn.net/20160804232822115" alt="这里写图片描述"></p>
 
       
     </div>
@@ -335,14 +369,18 @@
         <div class="post-nav">
           <div class="post-nav-next post-nav-item">
             
+              <a href="/QQzzZ.github.io/2018/01/11/插件占坑，四大组件动态注册前奏（一） 系统Activity的启动流程/" rel="next" title="插件占坑，四大组件动态注册前奏（一） 系统Activity的启动流程">
+                <i class="fa fa-chevron-left"></i> 插件占坑，四大组件动态注册前奏（一） 系统Activity的启动流程
+              </a>
+            
           </div>
 
           <span class="post-nav-divider"></span>
 
           <div class="post-nav-prev post-nav-item">
             
-              <a href="/QQzzZ.github.io/2018/01/11/概述/" rel="prev" title="Android插件化原理解析——概要">
-                Android插件化原理解析——概要 <i class="fa fa-chevron-right"></i>
+              <a href="/QQzzZ.github.io/2018/01/11/插件开发之360 DroidPlugin源码分析（三）Binder代理/" rel="prev" title="插件开发之360 DroidPlugin源码分析（三）Binder代理">
+                插件开发之360 DroidPlugin源码分析（三）Binder代理 <i class="fa fa-chevron-right"></i>
               </a>
             
           </div>
@@ -395,17 +433,8 @@
       
 
       
-        <ul class="sidebar-nav motion-element">
-          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
-            文章目录
-          </li>
-          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
-            站点概览
-          </li>
-        </ul>
-      
 
-      <section class="site-overview-wrap sidebar-panel">
+      <section class="site-overview-wrap sidebar-panel sidebar-panel-active">
         <div class="site-overview">
           <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
             
@@ -458,22 +487,6 @@
         </div>
       </section>
 
-      
-      <!--noindex-->
-        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
-          <div class="post-toc">
-
-            
-              
-            
-
-            
-              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#Quick-Start"><span class="nav-number">1.</span> <span class="nav-text">Quick Start</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#Create-a-new-post"><span class="nav-number">1.1.</span> <span class="nav-text">Create a new post</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Run-server"><span class="nav-number">1.2.</span> <span class="nav-text">Run server</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Generate-static-files"><span class="nav-number">1.3.</span> <span class="nav-text">Generate static files</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Deploy-to-remote-sites"><span class="nav-number">1.4.</span> <span class="nav-text">Deploy to remote sites</span></a></li></ol></li></ol></div>
-            
-
-          </div>
-        </section>
-      <!--/noindex-->
       
 
       

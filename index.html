@@ -235,6 +235,1265 @@
   
   
   <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="https://zhanqq2010.github.io/QQzzZ.github.io/2018/01/11/插件占坑，四大组件动态注册前奏（二） 系统Service的启动流程/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="QQzzZ">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/QQzzZ.github.io/uploads/avatar.png">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="zhanqq's Notes">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+                
+                <a class="post-title-link" href="/QQzzZ.github.io/2018/01/11/插件占坑，四大组件动态注册前奏（二） 系统Service的启动流程/" itemprop="url">插件占坑，四大组件动态注册前奏（二） 系统Service的启动流程</a></h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2018-01-11T14:08:33+08:00">
+                2018-01-11
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        
+          
+            <p>前言：为什么要了解系统Activity，Service,BroadCastReceiver,ContentProvider的启动流程，这是一个对于即将理解插件中的四大组件动态注册，占坑的前提，如果不了解的话，那么很难了解插件hook哪些东西，又是如何骗过AMS来启动Activity,Service,BroadCastReceiver，ContentProvider？</p>
+<p>本节主要记录系统Service的启动流程：<br>先看时序图：<br><img src="http://img.blog.csdn.net/20160814112136868" alt="这里写图片描述"></p>
+<p>与Activity组件的启动方式很像，Service启动分为隐式和显式两种，对于隐式启动Service组件来说，我们只需要知道它的组件名称，而对于显示的Service组件来说，需要知道它的类名称。<br>以一个后台播放音乐场景来说明：<br>通过实现一个MyService来实现一个异步任务来播放后台音乐</p>
+<p>MyActivity.java<br><img src="http://img.blog.csdn.net/20160814124249549" alt="这里写图片描述"><br><img src="http://img.blog.csdn.net/20160814121252748" alt="这里写图片描述"></p>
+<p>MyService.java<br><img src="http://img.blog.csdn.net/20160814121329312" alt="这里写图片描述"></p>
+<p>MyActivity组件绑定MyService的过程：</p>
+<ul>
+<li><strong>1.MyActivity向ActivityManagerService发送一个绑定CounterService组件的进程间通信请求。</strong></li>
+<li><strong>2.ActivityManagerService发现用来运行MyService组件的应用程序进程即为MyActivity组件所运行的应用程序进程，因此，它就直接通知应用程序进程将MyService启动起来。</strong></li>
+<li><strong>3.MyService组件启动起来后，ActivityManagerService就请求它返回一个Binder本地对象，以便MyActivity可以通过这个Binder本地对象来和MyService组件建立连接。</strong></li>
+<li><strong>4.ActivityManagerService将前面从MyService组件中获得的一个Binder本地对象发送给MyActivity组件。</strong></li>
+<li><strong>5.MyActivity组件获得了ActivityManagerService给它发送的Binder本地对象之后，就可以通过它来获得MyService组件的一个访问接口，MyActivity组件之后就可以通过这个访问接口来使用MyService组件所提供的服务，这就相当于将MyService绑定在了MyActivity中了。</strong></li>
+</ul>
+<p>那service在系统中绑定是如何的呢？<br>同样看下时序图：<br><img src="http://img.blog.csdn.net/20160814121642240" alt="这里写图片描述"></p>
+<p><img src="http://img.blog.csdn.net/20160814121710224" alt="这里写图片描述"></p>
+<p>客户端组件启动Server组件的过程：</p>
+<ul>
+<li><strong>1.Client组件启动ActivityManagerService发送一个启动Server组件的进程间通信请求。</strong></li>
+<li>2.ActivityManagerService发现用来运行Server组件的应用程序进程不存在，因此，它就会首先将Server组件的信息保存下来，接着再<br>创建一个新的应用程序进程 </li>
+<li><strong>3.新的应用程序启动完成之后，就会向ActivityManagerService发送一个启动完成进程间通信请求，以便ActivityManagerServices可以继续执行启动Service组件的操作。</strong></li>
+<li><strong>4.ActitivtyManagerService将2中保存下来的Service组件信息发送级第2步创建的应用程序进程，以便它可以将Server组件启动起来。</strong></li>
+</ul>
+
+          
+        
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+
+      
+
+      
+
+      
+      
+        <div class="post-eof"></div>
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+    
+      
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="https://zhanqq2010.github.io/QQzzZ.github.io/2018/01/11/插件开发之360 DroidPlugin源码分析（一）初识/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="QQzzZ">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/QQzzZ.github.io/uploads/avatar.png">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="zhanqq's Notes">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+                
+                <a class="post-title-link" href="/QQzzZ.github.io/2018/01/11/插件开发之360 DroidPlugin源码分析（一）初识/" itemprop="url">插件开发之360 DroidPlugin源码分析（一）初识</a></h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2018-01-11T14:08:33+08:00">
+                2018-01-11
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        
+          
+            <p>插件开发之360 DroidPlugin源码分析（一）初识</p>
+<p>###DroidPlugin的是什么？</p>
+<pre><code>一种新的插件机制，一种免安装的运行机制，是一个沙箱（但是不完全的沙箱。就是对于使用者来说，并不知道他会把apk怎么样）， 是模块化的基础。
+</code></pre><p>###DroidPlugin的缺点是什么？</p>
+<ul>
+<li><p>a.通知栏限制（无法在插件中发送具有自定义资源的Notification，例如： 1. 带自定义RemoteLayout的Notification 2. 图标通过R.drawable.XXX指定的通知（插件系统会自动将其转化为Bitmap）  </p>
+</li>
+<li><p>b.安全性担忧（可以修改，hook一些重要信息）</p>
+</li>
+<li><p>c.机型适配（不是所有机器上都能行，因为大量用反射相关，如果rom厂商深度定制了framework层，反射的方法或者类不在，容易插件运用失败）</p>
+</li>
+<li><p>d. 需要预先注册权限（在Library中申请了原生系统所有的权限）</p>
+</li>
+<li><p>e. 无法在插件中注册一些具有特殊Intent Filter的Service、Activity、BroadcastReceiver、ContentProvider等组件以供Android系统、已经安装的其他APP调用。</p>
+</li>
+<li><p>f. 缺乏对Native层的Hook，对某些带native代码的apk支持不好，可能无法运行。比如一部分游戏无法当作插件运行。</p>
+</li>
+</ul>
+<p>###DroidPlugin的特点是什么？</p>
+<ul>
+<li><p>a.免安装（就是如果只要从网上下载一个apk，不用安装apk，在插件机制下，就能运行）</p>
+</li>
+<li><p>b.无需修改源码（因为大量反射，代理，Binder相关，这些足以骗过framework层）</p>
+</li>
+<li><p>c.二进制级别隔离</p>
+</li>
+<li><p>d.插件之间可以相互调用</p>
+</li>
+<li><p>e.解除耦合</p>
+</li>
+<li><p>f.静默安装，就是前面说的不用安装，就可在插件机制中运行apk</p>
+</li>
+<li><p>g.崩溃隔离，插件崩溃，对主应用来说，不会有明显影响</p>
+</li>
+<li><p>h.还原插件自己的多进程机制，适配性</p>
+</li>
+<li><p>i.模块隔离，如可以把UI和控制逻辑进行隔离，控制逻辑可用插件化的方式</p>
+</li>
+</ul>
+<p>###官方说明：</p>
+<ul>
+<li>支持Androd 2.3以上系统</li>
+<li>插件APK完全不需做任何修改，可以独立安装运行、也可以做插件运行。要以插件模式运行某个APK，你无需重新编译、无需知道其源码。</li>
+<li>插件的四大组件完全不需要在Host程序中注册，支持Service、Activity、BroadcastReceiver、ContentProvider四大组件</li>
+<li>插件之间、Host程序与插件之间会互相认为对方已经”安装”在系统上了。</li>
+<li>API低侵入性：极少的API。HOST程序只是需要一行代码即可集成Droid Plugin</li>
+<li>超强隔离：插件之间、插件与Host之间完全的代码级别的隔离：不能互相调用对方的代码。通讯只能使用Android系统级别的通讯方法。</li>
+<li>支持所有系统API</li>
+<li>资源完全隔离：插件之间、与Host之间实现了资源完全隔离，不会出现资源窜用的情况。</li>
+<li>实现了进程管理，插件的空进程会被及时回收，占用内存低。</li>
+<li>插件的静态广播会被当作动态处理，如果插件没有运行（即没有插件进程运行），其静态广播也永远不会被触发。</li>
+</ul>
+<p>###DroidPlugin的的基本原理是什么？</p>
+<ul>
+<li><p>a.共享进程：为android提供一个进程运行多个apk的机制，通过API欺骗机制瞒过系统</p>
+</li>
+<li><p>b.占坑：通过预先占坑的方式实现不用在manifest注册，通过一带多的方式实现服务管理</p>
+</li>
+<li><p>c.Hook机制：动态代理实现函数hook，Binder代理绕过部分系统服务限制，IO重定向（先获取原始Object–&gt;Read,然后动态代理Hook Object后–&gt;Write回去，达到瞒天过海的目的）</p>
+</li>
+</ul>
+<p>插件Host的程序架构：<br><img src="http://img.blog.csdn.net/20160804222350965?watermark/2/text/aHR0cDovL2Jsb2cuY3Nkbi5uZXQv/font/5a6L5L2T/fontsize/400/fill/I0JBQkFCMA==/dissolve/70/gravity/Center" alt="这里写图片描述"></p>
+<p>下一篇开始分析基本原理中的Hook机制</p>
+<hr>
+
+          
+        
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+
+      
+
+      
+
+      
+      
+        <div class="post-eof"></div>
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+    
+      
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="https://zhanqq2010.github.io/QQzzZ.github.io/2018/01/11/插件开发之360 DroidPlugin源码分析（五）Service预注册占坑/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="QQzzZ">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/QQzzZ.github.io/uploads/avatar.png">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="zhanqq's Notes">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+                
+                <a class="post-title-link" href="/QQzzZ.github.io/2018/01/11/插件开发之360 DroidPlugin源码分析（五）Service预注册占坑/" itemprop="url">插件开发之360 DroidPlugin源码分析（五）Service预注册占坑</a></h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2018-01-11T14:08:33+08:00">
+                2018-01-11
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        
+          
+            <p>在了解系统的activity，service，broadcastReceiver的启动过程后，今天将分析下360 DroidPlugin是如何预注册占坑的？本篇文章主要分析Service预注册占坑，Service占了坑后又是什么时候开始瞒天过海欺骗AMS的？先看下Agenda：</p>
+<ul>
+<li><strong>AndroidManifest.xml中概览</strong></li>
+<li><strong>Service中关键方法被hook时机</strong></li>
+<li><strong>startService被hook</strong></li>
+<li><strong>瞒天过海流程图</strong></li>
+<li><strong>认识ServiceManager</strong></li>
+</ul>
+<p>##AndroidMainfest.xml中概览</p>
+<p><img src="http://img.blog.csdn.net/20160821023438578" alt="这里写图片描述"></p>
+<p>android:process=”:PluginP02” 表示自定义一个名为PluginP02的进程，该属性一旦设置, 那么App启动之后, Service肯定会以远程服务方式启动, —- 可通过adb shell ps 就可以看到有一个独立的进程启动了.</p>
+<p>项目 Package为 com.morgoo.droidplugin , 并设置 android:process=”:PluginP02”, 那么App运行时, 通过 adb shell ps | grep com.morgoo.droidplugin , 可以看到有两个进程:</p>
+<p><img src="http://img.blog.csdn.net/20160821025123414" alt="这里写图片描述"></p>
+<p>##startService被hook</p>
+<p>IActivityManagerHookHandle.startService方法</p>
+<p><img src="http://img.blog.csdn.net/20160821025156117" alt="这里写图片描述"></p>
+<p>replaceFirstServiceIntentOfArgs()</p>
+<p><img src="http://img.blog.csdn.net/20160821025222023" alt="这里写图片描述"></p>
+<p>接下来我们继续回到StartService类中，看下afterInvoke方法</p>
+<p><img src="http://img.blog.csdn.net/20160821025241211" alt="这里写图片描述"></p>
+<p>stopService,bindService,unbindService，setServiceForeground都是类似逻辑，可从源码中证实。<br>在前一篇<a href="http://blog.csdn.net/hejjunlin/article/details/52258434" target="_blank" rel="noopener">《插件开发之360 DroidPlugin源码分析（四）Activity预注册占坑》</a>，我们曾了解到，8个进程中的service在预注册占坑，在AndroidManifest.xml中只有一个，那如果插件要启动多个service怎么办？这是第一个问题，而我们知道所有和服务相关的都要在系统的systemServer进程中进行注册，难道DroidPlugin要逆天的本事？这是第二个问题<br>我们从代码中发现有一个ServceManager，这和android系统中大管家ServiceManager相差一个i，难道要改大管家的职责？又多了一个疑惑<br>仔细看了下ServceManager中的代码：</p>
+<p><img src="http://img.blog.csdn.net/20160821025303415" alt="这里写图片描述"><br><img src="http://img.blog.csdn.net/20160821025323853" alt="这里写图片描述"><br><img src="http://img.blog.csdn.net/20160821025349024" alt="这里写图片描述"></p>
+<p>以上代码可总结为：（以虚线分上下两部分）<br>1.上部分主要是ServceManager单例及有一个handleXXX相关的方法，下部分主要是Service的一些生命周期方法。<br>2.我们基本可以确定之前问题2和问题3的答案了，没有那么逆天的本事来操作ServiceManager，也不能修改大管家ServiceManager的职责<br>3.那问题又来了，这个类到底是做啥的？还起一个叫ServceManager的名字，<br>以hanldeOnTaskRemoveOne方法为例看看：</p>
+<p><img src="http://img.blog.csdn.net/20160821025410931" alt="这里写图片描述"></p>
+<p>接着再看下ServceManager中的onBind方法：</p>
+<p><img src="http://img.blog.csdn.net/20160821025431244" alt="这里写图片描述"></p>
+<p>然后调到handleOnBindOne方法中，我们前面分析了一个handleOnTaskRemovedOne方法，下面1-7步骤套路都是一样，主要在return时，直接调用service自身的onBind了，这和我们平时在Activity中new Intent,然后把这个intent传到onBind中.</p>
+<p><img src="http://img.blog.csdn.net/20160821025448183" alt="这里写图片描述"></p>
+<p>那么问题来了，还要这么一个类倒腾来干啥呢？还记得上面有一处逻辑service为null时，就调用了handleCreateServiceOne，好戏在这里：</p>
+<p><img src="http://img.blog.csdn.net/20160821025514512" alt="这里写图片描述"><br><img src="http://img.blog.csdn.net/20160821025554495" alt="这里写图片描述"></p>
+<p>看了上面的分析后，我们再去回想第一个问题，那如果插件要启动多个service怎么办？不知道不没有注意到mTokenServices，mNameService，mServiceTaskIds这些成员变量，它们都是Map，key不一样，value全是Service，如个有多个service在插件中启动了，mTokenServices，mNameService，mServiceTaskIds这些成员变量分别掌握了Service的Token,name，及任务id（通过token拿到的）。那岂不是已经在管理这些多个service了。至于附属于这个类起的名字，叫什么都无所谓。<br>以上可用如下流程图表示：<br><img src="http://img.blog.csdn.net/20160821033205794" alt="这里写图片描述"></p>
+<p>前面一直有个问题解释的不彻底，就是问题3，ServceManager是否担当了修改系统大管家ServiceManager的职责？接下来，我们就稍微了解下系统大管家ServiceManager是做什么的？（PS: ServiceManager和Binder机制一样，不是一天两个就能研究的清楚的）</p>
+<p>##认识ServiceManager</p>
+<p>Android系统Binder机制的总管是ServiceManager，所有的Server（System Server）都需要向它注册，应用程序需要向其查询相应的服务。平时，我们在studio上的DDMS中调试程序时，下图这个就是ServiceManager</p>
+<p>这里以Java层加入ServiceManager及getService为数据流分析一下。</p>
+<p>复习一下典型的Binder模式,有利于后面的理解：<br>1、客户端通过某种方式得到服务器端的代理对象。从客户端角度看来代理对象和他的本地对象没有什么差别。它可以像其他本地对象一样调用其方法，访问其变量。<br>2、客户端通过调用服务器代理对象的方法向服务器端发送请求。<br>3、代理对象把用户请求通过Android内核（Linux内核）的Binder驱动发送到服务器进程。<br>4、服务器进程处理用户请求，并通过Android内核（Linux内核）的Binder驱动返回处理结果给客户端的服务器代理对象。<br>5、客户端收到服务器端的返回结果。</p>
+<p>JAVA层代码分析：<br>ServiceManager.java (frameworks\base\core\java\android\os)</p>
+<p>对于xxxManager获取服务端service基本如此用法：<br>举例：<br>利用ContextImpl.java中的 public Object getSystemService(String name)</p>
+<p><img src="http://img.blog.csdn.net/20160821025616886" alt="这里写图片描述"></p>
+<p>然后再调用：ServiceManager.getService(ServiceName);获取相应的服务端</p>
+<p><img src="http://img.blog.csdn.net/20160821025639136" alt="这里写图片描述"></p>
+<p>知道了客户端获取一个Service的方法之后，我们回到ServiceManager的服务端：</p>
+<p><img src="http://img.blog.csdn.net/20160821025700683" alt="这里写图片描述"></p>
+<p>BinderInternal.getContextObject() @ BinderInternal.java 是一个native 函数：</p>
+<p>android_os_BinderInternal_getContextObject @ android_util_Binder.cpp<br>返回一个 BinderProxy对象保存到类成员mRemote(ServiceManagerProxy类成员)</p>
+<p>public abstract class ServiceManagerNative extends Binder implements IServiceManager<br>ServiceManagerNative 继承自 Binder 并实现了 IServiceManager 接口，利用 asInterface()则提供一个 ServiceManagerProxy 代理对象使用</p>
+<p>class ServiceManagerProxy implements IServiceManager<br>定义了类ServiceManagerProxy（代理），ServiceManagerProxy继承自IServiceManager，并实现了其声明的操作函数，只会被ServiceManagerNative创建，它实现了IServiceManager的接口，IServiceManager提供了getService和addService两个成员函数来管理系统中的Service。</p>
+<p><img src="http://img.blog.csdn.net/20160821025721230" alt="这里写图片描述"></p>
+<p>上面代码总结如下：Java层先利用Parcel对象将数据进行序列化，然后利用transact将数据传给binder驱动，就是上面mRemote.transact，mRemote在JNI层是一个叫BpBinder的对象：</p>
+<p>JNI层代码分析：<br>android_util_Binder.cpp</p>
+<p><img src="http://img.blog.csdn.net/20160821025737074" alt="这里写图片描述"></p>
+<p>每当我们利用BpBinder的transact()函数发起一次跨进程事务时，其内部其实是调用IPCThreadState对象的transact()。BpBinder的transact()代码如下：</p>
+<p><img src="http://img.blog.csdn.net/20160821025803184" alt="这里写图片描述"></p>
+<p>到此，不再向下深究，具体想了解可以看Binder机制及IPC相关内容。<br>所以，到这把第2个问题彻底弄明白了，ServiceManager和ServiceManager根本不是一回事。到次，Service的瞒天过海得以实现，接着，就是介绍时候说的那样无需修改源码，多进程，多service等功能。另外ContentProvider及BroadCast原理是类似，不再进行分析。<br>下篇将开始分析包管理(宿主插件和插件包名有什么规则)，APK解析（为什么可以免安装），进程管理（能确保隐藏起来，不会在process轻易被kill）</p>
+
+          
+        
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+
+      
+
+      
+
+      
+      
+        <div class="post-eof"></div>
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+    
+      
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="https://zhanqq2010.github.io/QQzzZ.github.io/2018/01/11/插件开发之360 DroidPlugin源码分析（四）Activity预注册占坑/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="QQzzZ">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/QQzzZ.github.io/uploads/avatar.png">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="zhanqq's Notes">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+                
+                <a class="post-title-link" href="/QQzzZ.github.io/2018/01/11/插件开发之360 DroidPlugin源码分析（四）Activity预注册占坑/" itemprop="url">插件开发之360 DroidPlugin源码分析（四）Activity预注册占坑</a></h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2018-01-11T14:08:33+08:00">
+                2018-01-11
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        
+          
+            <p>在了解系统的activity，service，broadcastReceiver的启动过程后，今天将分析下360 DroidPlugin是如何预注册占坑的？本篇文章主要分析Activity预注册占坑，Activity占了坑后又是什么时候开始瞒天过海欺骗AMS的？先看下Agenda：</p>
+<ul>
+<li><strong>AndroidMainfest.xml中概览</strong></li>
+<li><strong>Activity中关键方法被hook时机</strong></li>
+<li><strong>startActivity被hook</strong></li>
+<li><strong>handelPerformActivity被hook</strong></li>
+<li><strong>Activity预注册占坑整体流程图</strong></li>
+<li><strong>瞒天过海，冒充真实身份，欺骗AMS</strong></li>
+</ul>
+<p>##AndroidMainfest.xml中概览<br>我们知道所有能用的四大组件都要在Manifest中注册声明，第一步，先看AndroidManifest.xml，虽然在说hook机制时，也有提及过，但是毕竟没细致分析，话不多说，看代码上图：</p>
+<p><img src="http://img.blog.csdn.net/20160820022434578" alt="这里写图片描述"></p>
+<p>然后看下各个属性的意思</p>
+<p><img src="http://img.blog.csdn.net/20160820022530891" alt="这里写图片描述"></p>
+<p>表示一个activity1原来属于task1，但是如果task2启动起来的话，activity1可能不再属于task1了，转而投奔task2去了。 </p>
+<p><img src="http://img.blog.csdn.net/20160820022615141" alt="这里写图片描述"></p>
+<p>功能：启动硬件加速<br>缺点：占用内存<br>特点：可以在Application、Activity、Window、View四个级别进行硬件加速控制</p>
+<p>从Android3.0（API Level 11）开始，Android 2D渲染管道能够更好的支持硬件加速。硬件加速执行的所有的绘图操作都是使用GPU在View对象的画布上来进行的。因为启用硬件加速会增加资源的需求，因此这样的应用会占用更多的内存。</p>
+<p>启用硬件加速的最容易的方法是给整个应用程序都打开全局硬件加速功能。如果应用程序只使用标准的View和Drawable，那么打开全局硬件加速不会导致任何的不良的绘制效果。但是，因为硬件加速并不支持所有的2D图形绘制操作，所以对于那些使用定制的View和绘制调用的应用程序来说，打开全局硬件加速，可以会影响绘制效果。问题通常会出现在对那些不可见的元素进行了异常或错误的像素渲染。为了避免这种问题，Android提供以下级别，以便可选择性的启用或禁止硬件加速：</p>
+<p>控制硬件加速，能够用以下级别来控制硬件加速：</p>
+<p>1、Application级别</p>
+<p>在应用的Android清单文件中，把下列属性添加到元素中，来开启整个应用程序的硬件加速。</p>
+<p>2、Activity级别</p>
+<p>如果应用程序不能够正确的使用被打开的全局硬件加速，那么也可以对Activity分别进行控制。在元素中使用android:hardwareAccelerated属性，能够启用或禁止Activity级别的硬件加速。以下示例启用全局的硬件加速，但却禁止了一个Activity的硬件加速。</p>
+<p>3、Window级别</p>
+<p>如果需要更细粒度的控制，就可以使用下列代码来针对给定的窗口来启用硬件加速：</p>
+<p>注意：当前不能在Window级别禁止硬件加速。</p>
+<p><img src="http://img.blog.csdn.net/20160820022635297" alt="这里写图片描述"></p>
+<p>4、View级别</p>
+<p>能够使用下列代码在运行时针对一个独立的View对象来禁止硬件加速：</p>
+<p><img src="http://img.blog.csdn.net/20160820022653567" alt="这里写图片描述"></p>
+<p>注意：当前不能在View级别开启硬件加速。View层除了禁止硬件加速以外，还有其他的功能，更多的相关信息请看本文的“View层”。</p>
+<p><img src="http://img.blog.csdn.net/20160820022712099" alt="这里写图片描述"></p>
+<p><img src="http://img.blog.csdn.net/20160820022731756" alt="这里写图片描述"></p>
+<p>以上就是声明属性的含义说明，作为背景了解即可。重点看下面的分析</p>
+<p><img src="http://img.blog.csdn.net/20160820023211675" alt="这里写图片描述"></p>
+<p>Manifest中注册了8个进程，加上主进程共9个<br>然后第每个进程下面又有26个Activity注册，一个service，一个contentprovider,那么问题来了，搞这么多注册在manifest做什么用？仔细分类：就两类一类是Activity，一类是Dialog，我们知道Dialog是建立在Activity之上的，如果Activity被finish或destory后，就会报出异常：android.view.WindowManager$BadTokenException: Unable to add window — token android.os.BinderProxy@438e7108 is not valid; is your activity running?</p>
+<p>附<a href="http://blog.csdn.net/hejjunlin/article/details/52190050" target="_blank" rel="noopener">《插件占坑，四大组件动态注册前奏（一） 系统Activity的启动流程》</a>（也可点击链接过去看详细过程）的activity的启动时序列图： </p>
+<p><img src="http://img.blog.csdn.net/20160820023850754" alt="这里写图片描述"></p>
+<p><img src="http://img.blog.csdn.net/20160820023720565" alt="这里写图片描述"></p>
+<p>##Activity中关键方法被hook时机<br>其中startActivity()和handleLanchActivity()是被DroidPlugin 要欺骗系统的两个主要方法：</p>
+<p>第一个方法是最被经常使用的startActivity()，hook机制见<a href="http://blog.csdn.net/hejjunlin/article/details/52124397" target="_blank" rel="noopener">《插件开发之360 DroidPlugin源码分析（二）Hook机制》</a>中分析，主要是通过Java的反射机制替换掉IActivityManager全局对象，具体IActivityManagerHookHandle的onInstall()方法如下：</p>
+<p><img src="http://img.blog.csdn.net/20160820024836386" alt="这里写图片描述"><br><img src="http://img.blog.csdn.net/20160820024906121" alt="这里写图片描述"></p>
+<p>第二个方法是handleLaunchActivity()，这个方法属于ActivityThread的一个叫做H的内部类，前面讲Activity启动时，已埋下伏笔，可以参考<a href="http://blog.csdn.net/hejjunlin/article/details/52190050" target="_blank" rel="noopener">《插件占坑，四大组件动态注册前奏（一） 系统Activity的启动流程》</a>，如果学过中间人攻击协议的话，我们知道，现个通信双方发出消息后，进行消息验证，如果中间人拦截相关协议内容，通过一个代理进行转发出去，从而达到欺骗的目的，这里暂且理解handleLanchActivity被中间人攻击了，当启动handleLanchActivity时，被DroidPlugin hook后，那多人可能会想，你怎么hook住hanleLanchActivity呢？别忘了，我们可是在Manifest占了一堆坑的。要是不好理解，可以参看《插件前奏-android黑科技 hook介绍 ：<a href="http://blog.csdn.net/hejjunlin/article/details/52091833》，可能更直观些，哪在DroidPlugin中，如何在代码中瞒天过海的呢？" target="_blank" rel="noopener">http://blog.csdn.net/hejjunlin/article/details/52091833》，可能更直观些，哪在DroidPlugin中，如何在代码中瞒天过海的呢？</a><br>我们可以看下：PluginCallbackHook.java，其中有一个onInstall()方法：</p>
+<p><img src="http://img.blog.csdn.net/20160820025146498" alt="这里写图片描述"></p>
+<p>如上代码也有注释，可总结为：<br>1.DroidPlugin不是完全攻击mH这个内部类，而是把mH的mCallback成员变量攻击了，然后替换成了一个PluginCallback对象，进行消息分发，那么就可以在在PluginCallback的handleMessage()里任意拦截想要分发的消息，来欺骗AMS。经过中间人这么一闹腾，那就能达到控制这个区域的目的了。</p>
+<p>最狠的看下面：<br>上面代码中，有一个mH的mCallback,是被拦截攻击了吧，既然被拦截后又要冒充一个担当mH的mCallback职责相关，（这里暂且夸张的说）那肯定得扒了它身上的某些特性放到冒充的mCallback吧，如身份验证相关之类，所以那原来的mCallback丢了它的身份相关，不就是废了，暂且理解为mCallback为null,实际上有mCallback在未赋值之前，初始化时，本身也是null。然后看下PluginCallback的handleMessage()方法：（ps: PluginCallback简直就是仿照ActivityThread中的H内部类写的，几乎逻辑一样，具体可看系统源码证实）</p>
+<p><img src="http://img.blog.csdn.net/20160820025336718" alt="这里写图片描述"></p>
+<p>这里只拦截了一个消息类型为LAUNCH_ACTIVITY（ActivityThread中的H内部类中会有很多消息类型，也包含LAUNCH_ACTIVITY）。mCallback不为null，就是发一些伪装的消息（因为我们刚拦截了mCallback），如果为null,返回false，这样就会会再通过mH调用回真正ActivityThread的handleLaunchActivity()。（ps:系统发的消息没什么卵用时，我们就不去拦截，暂且理解为这样）</p>
+<p>以上就是两个方法怎么被hook相关分析，也可参考在Hook机制举例为IPackageManager的验证签名被hook的过程，接下来就是要看hook中做了什么事？附一张Activity预注册占坑整体流程图：</p>
+<p><img src="http://img.blog.csdn.net/20160820041934362" alt="这里写图片描述"></p>
+<p>前面我们都是在说DroidPlugin怎么用中间人攻击方式，拦截了startActivity()方法和hanleLanchActivity()方法，接下来要看下拦截了后，怎么把这种身份角色搞变化了（就是一个怎么扮演冒充的角色过程）：<br>1.首先得找一个和真实的人像的角色，这时启用的我们备用人员，也就是事先占的坑stub.ActivityStubxxx。<br>2.真实的角色身上有某些特定的特性，如爱抽烟，头发乱糟糟的，像Activity中Intent作为一个extra传到另一个Activity时，还有一些自己的lanchmode(启动方式)，theme(主题)，这些都是Activity的一些特性，所以stub.ActivityStubxxx也得有这些，否则怎么能达到冒充呢，这些我们在代码中早就写好了，所有的那些注册的26个备用人员都是继承ActivityStub，而ActivityStub是直接继承Activity，那还说啥呢，不就是天然的冒充么？说这么多了，直接看代码IActivityManagerHookHandle$startActvity：<br> 这是一个静态内部类，继承ReplaceCallingPackageHookedMethodHandler，重写了beforeInvoke方法，暂且理解为在冒充之前的一些准备工作，如下：</p>
+<p> <img src="http://img.blog.csdn.net/20160820030006720" alt="这里写图片描述"></p>
+<p>接着再看beforeStartActivity方法：</p>
+<p><img src="http://img.blog.csdn.net/20160820030135351" alt="这里写图片描述"></p>
+<p>就是判断了下Activity的启动模式，接着都调入doFinshIt(mRunningXXXActivityList),继续看此方法：</p>
+<p><img src="http://img.blog.csdn.net/20160820030246447" alt="这里写图片描述"></p>
+<p>STUB_NO_ACTIVITY_MAX_NUM为4，上面方法总结为：runningActivityList（备用activity的list的总数）大于等于3时，就把最早进入activityRecord栈中的那个finish掉，因为坑就那么多，要是都占着不干活，那要它干嘛？ </p>
+<p>##瞒天过海，冒充真实身份，欺骗AMS<br>前面这些，还是小打小闹，接下来看一个核心方法，就是beforeInvoke中的doReplaceIntentForStartActivityAPILow方法：</p>
+<p><img src="http://img.blog.csdn.net/20160820030850599" alt="这里写图片描述"></p>
+<p>前面我们说了，欺骗了两个方法，上面说的都是startActivity（），接下来看另个一个方法handleLanchActivity(), 这个方法在哪呢？我们前面说过有一个仿照ActivityThread中H内部类的class叫PluginCallBack,对，handleLaunchActivity就是在接到handleMessage中消息类型为LANCH_ACTIVITY时调用的：</p>
+<p><img src="http://img.blog.csdn.net/20160820031140005" alt="这里写图片描述"><img src="http://img.blog.csdn.net/20160820031214928" alt="这里写图片描述"><img src="http://img.blog.csdn.net/20160820031234975" alt="这里写图片描述"></p>
+<p>以上就是Activity预注册占坑，并欺骗AMS的过程，下篇分析Service预注册占坑。</p>
+<p>如果你觉得好，随手点赞，也是对笔者的肯定，也可以分享此公众号给你更多的人，原创不易</p>
+
+          
+        
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+
+      
+
+      
+
+      
+      
+        <div class="post-eof"></div>
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+    
+      
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="https://zhanqq2010.github.io/QQzzZ.github.io/2018/01/11/插件开发之360 DroidPlugin源码分析（三）Binder代理/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="QQzzZ">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/QQzzZ.github.io/uploads/avatar.png">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="zhanqq's Notes">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+                
+                <a class="post-title-link" href="/QQzzZ.github.io/2018/01/11/插件开发之360 DroidPlugin源码分析（三）Binder代理/" itemprop="url">插件开发之360 DroidPlugin源码分析（三）Binder代理</a></h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2018-01-11T14:08:33+08:00">
+                2018-01-11
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        
+          
+            <ul>
+<li><strong>Hook机制中Binder代理类关系图</strong></li>
+<li><strong>Hook机制中Binder代理时序图</strong></li>
+<li><strong>MyServiceManager</strong></li>
+<li><strong>ServiceManagerCacheBinderHook</strong></li>
+<li><strong>ServiceManagerBinderHook</strong></li>
+<li><strong>BinderHook</strong></li>
+</ul>
+<p>##Hook机制中Binder代理类关系图<br><img src="http://img.blog.csdn.net/20160806093432608" alt="这里写图片描述"></p>
+<p>##Hook机制中Binder代理时序图<br><img src="http://img.blog.csdn.net/20160806195618775" alt="这里写图片描述"><br><img src="http://img.blog.csdn.net/20160806195645164" alt="这里写图片描述"></p>
+<p>##MyServiceManager<br><img src="http://img.blog.csdn.net/20160806093657469" alt="这里写图片描述"></p>
+<ul>
+<li><strong>mOriginServiceCache：这里存储的是原始的service cache。每个ActivityThread在bindApplication()的时候，会从ServiceManager那边获得一个service cache（可以减少和Binder代理之间通信，系统Binder是一个专门的BinderProxy和把上层的service和Binder driver进行IPC），每次要和某个service通信时，会先检查这个cache里有没有代理对象，如果有的话就直接用，不需要再和ServiceManager进行一次binder交互了。</strong></li>
+<li><strong>mProxiedServiceCache：这里存储的就是service cache的代理对象了，因为我们要hook这些binder和上层（serviceConnection时会转成IBinder接口）调用，所以必须把service cache也替换成我们的代理对象，每次调用都会走进ServiceManagerCacheBinderHook对象的invoke()方法。</strong></li>
+<li><strong>mProxiedObjCache：这里存储的是所有的proxyservice Object，那原始的service对象放在哪里呢？其实是在BinderHook的mOldObj里。</strong><br>##ServiceManagerCacheBinderHook<br><img src="http://img.blog.csdn.net/20160806201458002" alt="这里写图片描述"></li>
+</ul>
+<p><img src="http://img.blog.csdn.net/20160806201643611" alt="这里写图片描述"></p>
+<p><img src="http://img.blog.csdn.net/20160806201701892" alt="这里写图片描述"><br>前面把service cache存起来，下次如果要真正和service进行通信，通过getOriginService()把原始的service cache拿出来用就行了。</p>
+<p>##ServiceManagerBinderHook<br><img src="http://img.blog.csdn.net/20160806202125416" alt="这里写图片描述"><br>这个类继承自ProxyHook，主要是用来hook住getService()和checkService()这两个API。如果这两个API被调用，并且在mProxiedObjCache发现有对应的代理对象，则直接返回这个代理对象。</p>
+<p>##BinderHook<br><img src="http://img.blog.csdn.net/20160806204805563" alt="这里写图片描述"></p>
+<p><img src="http://img.blog.csdn.net/20160806204917738" alt="这里写图片描述"><br>先调用ServiceManagerCacheBinderHook的onInstall()方法更新一下service cache，然后生成一个新的代理对象放到mProxiedObjCache里。这样下次不管是从cache里取，还是直接通过binder调用，就都会返回我们的代理对象。</p>
+<p>Binder代理其实在android 系统中也是一个十分重要的角色。</p>
+<p>这部分可以从网上搜下相关资料。360 plugin 的Binder代理就是借鉴了系统的Binder相关。</p>
+
+          
+        
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+
+      
+
+      
+
+      
+      
+        <div class="post-eof"></div>
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+    
+      
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="https://zhanqq2010.github.io/QQzzZ.github.io/2018/01/11/插件开发之360 DroidPlugin源码分析（二）Hook机制/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="QQzzZ">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/QQzzZ.github.io/uploads/avatar.png">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="zhanqq's Notes">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+                
+                <a class="post-title-link" href="/QQzzZ.github.io/2018/01/11/插件开发之360 DroidPlugin源码分析（二）Hook机制/" itemprop="url">插件开发之360 DroidPlugin源码分析（二）Hook机制</a></h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2018-01-11T14:08:33+08:00">
+                2018-01-11
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        
+          
+            <p>前言：新插件的开发，可以说是为插件开发者带来了福音，虽然还很多坑要填补，对于这款牛逼的插件机制，一直想找个时间分析和总结下它的code，话不多说，直接入正题，本文是分析../hook/handle及../hook/proxy下代码，../hook/binder单独分析</p>
+<ul>
+<li><strong>Hook机制的包结构关系</strong></li>
+<li><strong>Hook机制的类图关系</strong></li>
+<li><strong>Hook机制的时序图关系</strong></li>
+<li><strong>Manifest权制申请</strong></li>
+<li><strong>基类Hook做了什么？</strong></li>
+<li><strong>HookedMethodHandler</strong></li>
+<li><strong>基类BaseHookHandle和Hook有什么关系？</strong></li>
+<li><strong>ProxyHook能干什么？</strong></li>
+<li><strong>实例-如何hook IPackageManager</strong></li>
+</ul>
+<p>##Hook机制的包结构关系<br><img src="http://img.blog.csdn.net/20160804225345196" alt="这里写图片描述"></p>
+<p>##Hook机制类图关系<br><img src="http://img.blog.csdn.net/20160804223440825" alt="这里写图片描述"><br>首先定义了一个基类Hook，抽象类，外部可以通过setEnable()方法来使能否hook。声明了onInstall和onUnInstall及相关的方法，子类可以覆盖这些方法完成相应的车间机床,这里相当于提供一个车间，机床上的具体操作什么由子类去自己实现。</p>
+<p>##Hook机制的时序图关系<br><img src="http://img.blog.csdn.net/20160804231948003" alt="这里写图片描述"></p>
+<p>##Manifest权限申请<br>插件管理服务类声明：<br><img src="http://img.blog.csdn.net/20160804223958687" alt="这里写图片描述"></p>
+<p>权限申请：<br><img src="http://img.blog.csdn.net/20160804224026000" alt="这里写图片描述"></p>
+<p>##基类Hook做了什么？<br><img src="http://img.blog.csdn.net/20160804224240240" alt="这里写图片描述"></p>
+<p>##ProxyHook<br><img src="http://img.blog.csdn.net/20160804224830919" alt="这里写图片描述"></p>
+<p>ProxyHook继承自Hook，实现了InvocationHandler接口。它有一个setOldObj()方法，用来保存原始对象。新的代理对象可以看到在代码中是如何实现的（动态代理）</p>
+<p>##BaseHookHandle<br><img src="http://img.blog.csdn.net/20160804224623385" alt="这里写图片描述"></p>
+<p><img src="http://img.blog.csdn.net/20160804224710183" alt="这里写图片描述"><br>接上面ProxyHook中的invoke()方法，mHookHandles是一个BaseHookHandle对象，内部包含了一个Map，可以根据API名映射到对应对应的HookedMethodHandler对象。这个Map由其子类IXXXHookHandle在初始化的时候进行填充。<br>紧接着调用HookedMethodHandler的doHookInner()方法：</p>
+<p>##HookedMethodHandler<br><img src="http://img.blog.csdn.net/20160804224440227" alt="这里写图片描述"></p>
+<p>##ReplaceCallingPackageHookedMethodHandler<br><img src="http://img.blog.csdn.net/20160804232212379" alt="这里写图片描述"></p>
+<p>##IO重定向<br><img src="http://img.blog.csdn.net/20160804225003968" alt="这里写图片描述"></p>
+<p>##递归遍历<br><img src="http://img.blog.csdn.net/20160804225111866" alt="这里写图片描述"></p>
+<p>##以IPackageManager为例<br>IPackageManagerHook：Hook所有IPackageManager的方法<br>IActivityManagerHookHandle：安装所有被Hook的方法的处理对象，加入到Map中<br>IPackageManagerHandle.checkSignatures：这是一个内部类，继承HookedMethodHandler, 专门校验签名的。以此，还有各种各样的PackageManger原生中的方法，在这都变成了一个内部类继承了HookedMethodHandler.上图：<br>IPackageManagerHookHandle：</p>
+<p><img src="http://img.blog.csdn.net/20160804232822115" alt="这里写图片描述"></p>
+
+          
+        
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+
+      
+
+      
+
+      
+      
+        <div class="post-eof"></div>
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+    
+      
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="https://zhanqq2010.github.io/QQzzZ.github.io/2018/01/11/插件占坑，四大组件动态注册前奏（一） 系统Activity的启动流程/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="QQzzZ">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/QQzzZ.github.io/uploads/avatar.png">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="zhanqq's Notes">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+                
+                <a class="post-title-link" href="/QQzzZ.github.io/2018/01/11/插件占坑，四大组件动态注册前奏（一） 系统Activity的启动流程/" itemprop="url">插件占坑，四大组件动态注册前奏（一） 系统Activity的启动流程</a></h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2018-01-11T14:08:33+08:00">
+                2018-01-11
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        
+          
+            <p>前言：为什么要了解系统Activity，Service,,BroadCastReceiver,ContentProvider的启动流程，这是一个对于即将理解插件中的四大组件动态注册，占坑的前提，如果不了解的话，那么很难了解插件hook哪些东西，又是如何骗过AMS来启动Activity,Service,BroadCastReceiver，ContentProvider？</p>
+<p>本节主要记录系统Activity的启动流程：<br>先看下时序图：<br><img src="http://img.blog.csdn.net/20160812104759495" alt="这里写图片描述"></p>
+<p><img src="http://img.blog.csdn.net/20160812104813573" alt="这里写图片描述"></p>
+<p>//接上面两张图：<br><img src="http://img.blog.csdn.net/20160812104827618" alt="这里写图片描述"><br>和插件相关主要在第三张图，<br>先看H类：这是ActivityThread中的内部类，此类继承自Handler，重写handleMeaage方法, 将msg转换成一个ActivityClientRecord对象，调用ActivityThread类成员函数getPackageInfoNoCheck来获得一个LoadApk对象，并且保存在ActivityClientRecord对象r的成员变量packageInfo中。<br>ActivityThread有一个该类型的成员变量mH。scheduleLaunchActivity()里会发送一个LAUNCH_ACTIVITY类型的消息，该消息被mH处理并调用handleLaunchActivity()。</p>
+<p>handleLaunchActivity(r,main)来启动ActivityClientRecord对象t所描述的一个Activity组件。即MyActivity</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br><span class="line">84</span><br><span class="line">85</span><br><span class="line">86</span><br><span class="line">87</span><br><span class="line">88</span><br><span class="line">89</span><br><span class="line">90</span><br><span class="line">91</span><br><span class="line">92</span><br><span class="line">93</span><br><span class="line">94</span><br><span class="line">95</span><br><span class="line">96</span><br><span class="line">97</span><br><span class="line">98</span><br><span class="line">99</span><br><span class="line">100</span><br><span class="line">101</span><br><span class="line">102</span><br><span class="line">103</span><br><span class="line">104</span><br><span class="line">105</span><br><span class="line">106</span><br><span class="line">107</span><br><span class="line">108</span><br><span class="line">109</span><br><span class="line">110</span><br><span class="line">111</span><br><span class="line">112</span><br><span class="line">113</span><br><span class="line">114</span><br><span class="line">115</span><br><span class="line">116</span><br><span class="line">117</span><br><span class="line">118</span><br><span class="line">119</span><br><span class="line">120</span><br><span class="line">121</span><br><span class="line">122</span><br><span class="line">123</span><br><span class="line">124</span><br><span class="line">125</span><br><span class="line">126</span><br><span class="line">127</span><br><span class="line">128</span><br><span class="line">129</span><br><span class="line">130</span><br><span class="line">131</span><br><span class="line">132</span><br><span class="line">133</span><br><span class="line">134</span><br><span class="line">135</span><br><span class="line">136</span><br><span class="line">137</span><br><span class="line">138</span><br><span class="line">139</span><br><span class="line">140</span><br><span class="line">141</span><br><span class="line">142</span><br><span class="line">143</span><br><span class="line">144</span><br><span class="line">145</span><br><span class="line">146</span><br><span class="line">147</span><br><span class="line">148</span><br><span class="line">149</span><br><span class="line">150</span><br><span class="line">151</span><br><span class="line">152</span><br><span class="line">153</span><br><span class="line">154</span><br><span class="line">155</span><br><span class="line">156</span><br><span class="line">157</span><br><span class="line">158</span><br><span class="line">159</span><br><span class="line">160</span><br><span class="line">161</span><br><span class="line">162</span><br><span class="line">163</span><br><span class="line">164</span><br><span class="line">165</span><br><span class="line">166</span><br><span class="line">167</span><br><span class="line">168</span><br><span class="line">169</span><br><span class="line">170</span><br><span class="line">171</span><br><span class="line">172</span><br><span class="line">173</span><br><span class="line">174</span><br><span class="line">175</span><br><span class="line">176</span><br><span class="line">177</span><br><span class="line">178</span><br><span class="line">179</span><br><span class="line">180</span><br><span class="line">181</span><br><span class="line">182</span><br><span class="line">183</span><br><span class="line">184</span><br><span class="line">185</span><br><span class="line">186</span><br><span class="line">187</span><br><span class="line">188</span><br><span class="line">189</span><br><span class="line">190</span><br><span class="line">191</span><br><span class="line">192</span><br><span class="line">193</span><br><span class="line">194</span><br><span class="line">195</span><br><span class="line">196</span><br><span class="line">197</span><br><span class="line">198</span><br><span class="line">199</span><br><span class="line">200</span><br><span class="line">201</span><br><span class="line">202</span><br><span class="line">203</span><br><span class="line">204</span><br><span class="line">205</span><br><span class="line">206</span><br><span class="line">207</span><br><span class="line">208</span><br><span class="line">209</span><br><span class="line">210</span><br><span class="line">211</span><br><span class="line">212</span><br><span class="line">213</span><br><span class="line">214</span><br><span class="line">215</span><br><span class="line">216</span><br><span class="line">217</span><br><span class="line">218</span><br><span class="line">219</span><br><span class="line">220</span><br><span class="line">221</span><br><span class="line">222</span><br><span class="line">223</span><br><span class="line">224</span><br><span class="line">225</span><br><span class="line">226</span><br><span class="line">227</span><br><span class="line">228</span><br><span class="line">229</span><br><span class="line">230</span><br><span class="line">231</span><br><span class="line">232</span><br><span class="line">233</span><br><span class="line">234</span><br><span class="line">235</span><br><span class="line">236</span><br><span class="line">237</span><br><span class="line">238</span><br><span class="line">239</span><br><span class="line">240</span><br><span class="line">241</span><br><span class="line">242</span><br><span class="line">243</span><br><span class="line">244</span><br><span class="line">245</span><br><span class="line">246</span><br><span class="line">247</span><br><span class="line">248</span><br><span class="line">249</span><br><span class="line">250</span><br><span class="line">251</span><br><span class="line">252</span><br><span class="line">253</span><br><span class="line">254</span><br><span class="line">255</span><br><span class="line">256</span><br><span class="line">257</span><br><span class="line">258</span><br><span class="line">259</span><br><span class="line">260</span><br><span class="line">261</span><br><span class="line">262</span><br><span class="line">263</span><br><span class="line">264</span><br><span class="line">265</span><br><span class="line">266</span><br><span class="line">267</span><br><span class="line">268</span><br><span class="line">269</span><br><span class="line">270</span><br><span class="line">271</span><br><span class="line">272</span><br><span class="line">273</span><br><span class="line">274</span><br><span class="line">275</span><br><span class="line">276</span><br><span class="line">277</span><br><span class="line">278</span><br><span class="line">279</span><br><span class="line">280</span><br><span class="line">281</span><br><span class="line">282</span><br><span class="line">283</span><br><span class="line">284</span><br><span class="line">285</span><br><span class="line">286</span><br><span class="line">287</span><br><span class="line">288</span><br><span class="line">289</span><br><span class="line">290</span><br><span class="line">291</span><br><span class="line">292</span><br><span class="line">293</span><br><span class="line">294</span><br><span class="line">295</span><br><span class="line">296</span><br><span class="line">297</span><br><span class="line">298</span><br><span class="line">299</span><br><span class="line">300</span><br><span class="line">301</span><br><span class="line">302</span><br><span class="line">303</span><br><span class="line">304</span><br><span class="line">305</span><br><span class="line">306</span><br><span class="line">307</span><br><span class="line">308</span><br><span class="line">309</span><br><span class="line">310</span><br><span class="line">311</span><br><span class="line">312</span><br><span class="line">313</span><br><span class="line">314</span><br><span class="line">315</span><br><span class="line">316</span><br><span class="line">317</span><br><span class="line">318</span><br><span class="line">319</span><br></pre></td><td class="code"><pre><span class="line">private class H extends Handler &#123;</span><br><span class="line">    public static final int LAUNCH_ACTIVITY         = 100;</span><br><span class="line">    public static final int PAUSE_ACTIVITY          = 101;</span><br><span class="line">    public static final int PAUSE_ACTIVITY_FINISHING= 102;</span><br><span class="line">    public static final int STOP_ACTIVITY_SHOW      = 103;</span><br><span class="line">    public static final int STOP_ACTIVITY_HIDE      = 104;</span><br><span class="line">    public static final int SHOW_WINDOW             = 105;</span><br><span class="line">    public static final int HIDE_WINDOW             = 106;</span><br><span class="line">    public static final int RESUME_ACTIVITY         = 107;</span><br><span class="line">    public static final int SEND_RESULT             = 108;</span><br><span class="line">    public static final int DESTROY_ACTIVITY        = 109;</span><br><span class="line">    public static final int BIND_APPLICATION        = 110;</span><br><span class="line">    public static final int EXIT_APPLICATION        = 111;</span><br><span class="line">    public static final int NEW_INTENT              = 112;</span><br><span class="line">    public static final int RECEIVER                = 113;</span><br><span class="line">    public static final int CREATE_SERVICE          = 114;</span><br><span class="line">    public static final int SERVICE_ARGS            = 115;</span><br><span class="line">    public static final int STOP_SERVICE            = 116;</span><br><span class="line">    public static final int REQUEST_THUMBNAIL       = 117;</span><br><span class="line">    public static final int CONFIGURATION_CHANGED   = 118;</span><br><span class="line">    public static final int CLEAN_UP_CONTEXT        = 119;</span><br><span class="line">    public static final int GC_WHEN_IDLE            = 120;</span><br><span class="line">    public static final int BIND_SERVICE            = 121;</span><br><span class="line">    public static final int UNBIND_SERVICE          = 122;</span><br><span class="line">    public static final int DUMP_SERVICE            = 123;</span><br><span class="line">    public static final int LOW_MEMORY              = 124;</span><br><span class="line">    public static final int ACTIVITY_CONFIGURATION_CHANGED = 125;</span><br><span class="line">    public static final int RELAUNCH_ACTIVITY       = 126;</span><br><span class="line">    public static final int PROFILER_CONTROL        = 127;</span><br><span class="line">    public static final int CREATE_BACKUP_AGENT     = 128;</span><br><span class="line">    public static final int DESTROY_BACKUP_AGENT    = 129;</span><br><span class="line">    public static final int SUICIDE                 = 130;</span><br><span class="line">    public static final int REMOVE_PROVIDER         = 131;</span><br><span class="line">    public static final int ENABLE_JIT              = 132;</span><br><span class="line">    public static final int DISPATCH_PACKAGE_BROADCAST = 133;</span><br><span class="line">    public static final int SCHEDULE_CRASH          = 134;</span><br><span class="line">    public static final int DUMP_HEAP               = 135;</span><br><span class="line">    public static final int DUMP_ACTIVITY           = 136;</span><br><span class="line">    public static final int SLEEPING                = 137;</span><br><span class="line">    public static final int SET_CORE_SETTINGS       = 138;</span><br><span class="line">    public static final int UPDATE_PACKAGE_COMPATIBILITY_INFO = 139;</span><br><span class="line">    public static final int TRIM_MEMORY             = 140;</span><br><span class="line">    public static final int DUMP_PROVIDER           = 141;</span><br><span class="line">    public static final int UNSTABLE_PROVIDER_DIED  = 142;</span><br><span class="line">    public static final int REQUEST_ASSIST_CONTEXT_EXTRAS = 143;</span><br><span class="line">    public static final int TRANSLUCENT_CONVERSION_COMPLETE = 144;</span><br><span class="line">    public static final int INSTALL_PROVIDER        = 145;</span><br><span class="line">    String codeToString(int code) &#123;</span><br><span class="line">        if (DEBUG_MESSAGES) &#123;</span><br><span class="line">            switch (code) &#123;</span><br><span class="line">                case LAUNCH_ACTIVITY: return &quot;LAUNCH_ACTIVITY&quot;;</span><br><span class="line">                case PAUSE_ACTIVITY: return &quot;PAUSE_ACTIVITY&quot;;</span><br><span class="line">                case PAUSE_ACTIVITY_FINISHING: return &quot;PAUSE_ACTIVITY_FINISHING&quot;;</span><br><span class="line">                case STOP_ACTIVITY_SHOW: return &quot;STOP_ACTIVITY_SHOW&quot;;</span><br><span class="line">                case STOP_ACTIVITY_HIDE: return &quot;STOP_ACTIVITY_HIDE&quot;;</span><br><span class="line">                case SHOW_WINDOW: return &quot;SHOW_WINDOW&quot;;</span><br><span class="line">                case HIDE_WINDOW: return &quot;HIDE_WINDOW&quot;;</span><br><span class="line">                case RESUME_ACTIVITY: return &quot;RESUME_ACTIVITY&quot;;</span><br><span class="line">                case SEND_RESULT: return &quot;SEND_RESULT&quot;;</span><br><span class="line">                case DESTROY_ACTIVITY: return &quot;DESTROY_ACTIVITY&quot;;</span><br><span class="line">                case BIND_APPLICATION: return &quot;BIND_APPLICATION&quot;;</span><br><span class="line">                case EXIT_APPLICATION: return &quot;EXIT_APPLICATION&quot;;</span><br><span class="line">                case NEW_INTENT: return &quot;NEW_INTENT&quot;;</span><br><span class="line">                case RECEIVER: return &quot;RECEIVER&quot;;</span><br><span class="line">                case CREATE_SERVICE: return &quot;CREATE_SERVICE&quot;;</span><br><span class="line">                case SERVICE_ARGS: return &quot;SERVICE_ARGS&quot;;</span><br><span class="line">                case STOP_SERVICE: return &quot;STOP_SERVICE&quot;;</span><br><span class="line">                case REQUEST_THUMBNAIL: return &quot;REQUEST_THUMBNAIL&quot;;</span><br><span class="line">                case CONFIGURATION_CHANGED: return &quot;CONFIGURATION_CHANGED&quot;;</span><br><span class="line">                case CLEAN_UP_CONTEXT: return &quot;CLEAN_UP_CONTEXT&quot;;</span><br><span class="line">                case GC_WHEN_IDLE: return &quot;GC_WHEN_IDLE&quot;;</span><br><span class="line">                case BIND_SERVICE: return &quot;BIND_SERVICE&quot;;</span><br><span class="line">                case UNBIND_SERVICE: return &quot;UNBIND_SERVICE&quot;;</span><br><span class="line">                case DUMP_SERVICE: return &quot;DUMP_SERVICE&quot;;</span><br><span class="line">                case LOW_MEMORY: return &quot;LOW_MEMORY&quot;;</span><br><span class="line">                case ACTIVITY_CONFIGURATION_CHANGED: return &quot;ACTIVITY_CONFIGURATION_CHANGED&quot;;</span><br><span class="line">                case RELAUNCH_ACTIVITY: return &quot;RELAUNCH_ACTIVITY&quot;;</span><br><span class="line">                case PROFILER_CONTROL: return &quot;PROFILER_CONTROL&quot;;</span><br><span class="line">                case CREATE_BACKUP_AGENT: return &quot;CREATE_BACKUP_AGENT&quot;;</span><br><span class="line">                case DESTROY_BACKUP_AGENT: return &quot;DESTROY_BACKUP_AGENT&quot;;</span><br><span class="line">                case SUICIDE: return &quot;SUICIDE&quot;;</span><br><span class="line">                case REMOVE_PROVIDER: return &quot;REMOVE_PROVIDER&quot;;</span><br><span class="line">                case ENABLE_JIT: return &quot;ENABLE_JIT&quot;;</span><br><span class="line">                case DISPATCH_PACKAGE_BROADCAST: return &quot;DISPATCH_PACKAGE_BROADCAST&quot;;</span><br><span class="line">                case SCHEDULE_CRASH: return &quot;SCHEDULE_CRASH&quot;;</span><br><span class="line">                case DUMP_HEAP: return &quot;DUMP_HEAP&quot;;</span><br><span class="line">                case DUMP_ACTIVITY: return &quot;DUMP_ACTIVITY&quot;;</span><br><span class="line">                case SLEEPING: return &quot;SLEEPING&quot;;</span><br><span class="line">                case SET_CORE_SETTINGS: return &quot;SET_CORE_SETTINGS&quot;;</span><br><span class="line">                case UPDATE_PACKAGE_COMPATIBILITY_INFO: return &quot;UPDATE_PACKAGE_COMPATIBILITY_INFO&quot;;</span><br><span class="line">                case TRIM_MEMORY: return &quot;TRIM_MEMORY&quot;;</span><br><span class="line">                case DUMP_PROVIDER: return &quot;DUMP_PROVIDER&quot;;</span><br><span class="line">                case UNSTABLE_PROVIDER_DIED: return &quot;UNSTABLE_PROVIDER_DIED&quot;;</span><br><span class="line">                case REQUEST_ASSIST_CONTEXT_EXTRAS: return &quot;REQUEST_ASSIST_CONTEXT_EXTRAS&quot;;</span><br><span class="line">                case TRANSLUCENT_CONVERSION_COMPLETE: return &quot;TRANSLUCENT_CONVERSION_COMPLETE&quot;;</span><br><span class="line">                case INSTALL_PROVIDER: return &quot;INSTALL_PROVIDER&quot;;</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line">        return Integer.toString(code);</span><br><span class="line">    &#125;</span><br><span class="line">    public void handleMessage(Message msg) &#123;</span><br><span class="line">        if (DEBUG_MESSAGES) Slog.v(TAG, &quot;&gt;&gt;&gt; handling: &quot; + codeToString(msg.what));</span><br><span class="line">        switch (msg.what) &#123;</span><br><span class="line">            case LAUNCH_ACTIVITY: &#123;</span><br><span class="line">                Trace.traceBegin(Trace.TRACE_TAG_ACTIVITY_MANAGER, &quot;activityStart&quot;);</span><br><span class="line">                ActivityClientRecord r = (ActivityClientRecord)msg.obj;</span><br><span class="line"></span><br><span class="line">                r.packageInfo = getPackageInfoNoCheck(</span><br><span class="line">                        r.activityInfo.applicationInfo, r.compatInfo);</span><br><span class="line">                handleLaunchActivity(r, null);</span><br><span class="line">                Trace.traceEnd(Trace.TRACE_TAG_ACTIVITY_MANAGER);</span><br><span class="line">            &#125; break;</span><br><span class="line">            case RELAUNCH_ACTIVITY: &#123;</span><br><span class="line">                Trace.traceBegin(Trace.TRACE_TAG_ACTIVITY_MANAGER, &quot;activityRestart&quot;);</span><br><span class="line">                ActivityClientRecord r = (ActivityClientRecord)msg.obj;</span><br><span class="line">                handleRelaunchActivity(r);</span><br><span class="line">                Trace.traceEnd(Trace.TRACE_TAG_ACTIVITY_MANAGER);</span><br><span class="line">            &#125; break;</span><br><span class="line">            case PAUSE_ACTIVITY:</span><br><span class="line">                Trace.traceBegin(Trace.TRACE_TAG_ACTIVITY_MANAGER, &quot;activityPause&quot;);</span><br><span class="line">                handlePauseActivity((IBinder)msg.obj, false, msg.arg1 != 0, msg.arg2);</span><br><span class="line">                maybeSnapshot();</span><br><span class="line">                Trace.traceEnd(Trace.TRACE_TAG_ACTIVITY_MANAGER);</span><br><span class="line">                break;</span><br><span class="line">            case PAUSE_ACTIVITY_FINISHING:</span><br><span class="line">                Trace.traceBegin(Trace.TRACE_TAG_ACTIVITY_MANAGER, &quot;activityPause&quot;);</span><br><span class="line">                handlePauseActivity((IBinder)msg.obj, true, msg.arg1 != 0, msg.arg2);</span><br><span class="line">                Trace.traceEnd(Trace.TRACE_TAG_ACTIVITY_MANAGER);</span><br><span class="line">                break;</span><br><span class="line">            case STOP_ACTIVITY_SHOW:</span><br><span class="line">                Trace.traceBegin(Trace.TRACE_TAG_ACTIVITY_MANAGER, &quot;activityStop&quot;);</span><br><span class="line">                handleStopActivity((IBinder)msg.obj, true, msg.arg2);</span><br><span class="line">                Trace.traceEnd(Trace.TRACE_TAG_ACTIVITY_MANAGER);</span><br><span class="line">                break;</span><br><span class="line">            case STOP_ACTIVITY_HIDE:</span><br><span class="line">                Trace.traceBegin(Trace.TRACE_TAG_ACTIVITY_MANAGER, &quot;activityStop&quot;);</span><br><span class="line">                handleStopActivity((IBinder)msg.obj, false, msg.arg2);</span><br><span class="line">                Trace.traceEnd(Trace.TRACE_TAG_ACTIVITY_MANAGER);</span><br><span class="line">                break;</span><br><span class="line">            case SHOW_WINDOW:</span><br><span class="line">                Trace.traceBegin(Trace.TRACE_TAG_ACTIVITY_MANAGER, &quot;activityShowWindow&quot;);</span><br><span class="line">                handleWindowVisibility((IBinder)msg.obj, true);</span><br><span class="line">                Trace.traceEnd(Trace.TRACE_TAG_ACTIVITY_MANAGER);</span><br><span class="line">                break;</span><br><span class="line">            case HIDE_WINDOW:</span><br><span class="line">                Trace.traceBegin(Trace.TRACE_TAG_ACTIVITY_MANAGER, &quot;activityHideWindow&quot;);</span><br><span class="line">                handleWindowVisibility((IBinder)msg.obj, false);</span><br><span class="line">                Trace.traceEnd(Trace.TRACE_TAG_ACTIVITY_MANAGER);</span><br><span class="line">                break;</span><br><span class="line">            case RESUME_ACTIVITY:</span><br><span class="line">                Trace.traceBegin(Trace.TRACE_TAG_ACTIVITY_MANAGER, &quot;activityResume&quot;);</span><br><span class="line">                handleResumeActivity((IBinder)msg.obj, true,</span><br><span class="line">                        msg.arg1 != 0, true);</span><br><span class="line">                Trace.traceEnd(Trace.TRACE_TAG_ACTIVITY_MANAGER);</span><br><span class="line">                break;</span><br><span class="line">            case SEND_RESULT:</span><br><span class="line">                Trace.traceBegin(Trace.TRACE_TAG_ACTIVITY_MANAGER, &quot;activityDeliverResult&quot;);</span><br><span class="line">                handleSendResult((ResultData)msg.obj);</span><br><span class="line">                Trace.traceEnd(Trace.TRACE_TAG_ACTIVITY_MANAGER);</span><br><span class="line">                break;</span><br><span class="line">            case DESTROY_ACTIVITY:</span><br><span class="line">                Trace.traceBegin(Trace.TRACE_TAG_ACTIVITY_MANAGER, &quot;activityDestroy&quot;);</span><br><span class="line">                handleDestroyActivity((IBinder)msg.obj, msg.arg1 != 0,</span><br><span class="line">                        msg.arg2, false);</span><br><span class="line">                Trace.traceEnd(Trace.TRACE_TAG_ACTIVITY_MANAGER);</span><br><span class="line">                break;</span><br><span class="line">            case BIND_APPLICATION:</span><br><span class="line">                Trace.traceBegin(Trace.TRACE_TAG_ACTIVITY_MANAGER, &quot;bindApplication&quot;);</span><br><span class="line">                AppBindData data = (AppBindData)msg.obj;</span><br><span class="line">                handleBindApplication(data);</span><br><span class="line">                Trace.traceEnd(Trace.TRACE_TAG_ACTIVITY_MANAGER);</span><br><span class="line">                break;</span><br><span class="line">            case EXIT_APPLICATION:</span><br><span class="line">                if (mInitialApplication != null) &#123;</span><br><span class="line">                    mInitialApplication.onTerminate();</span><br><span class="line">                &#125;</span><br><span class="line">                Looper.myLooper().quit();</span><br><span class="line">                break;</span><br><span class="line">            case NEW_INTENT:</span><br><span class="line">                Trace.traceBegin(Trace.TRACE_TAG_ACTIVITY_MANAGER, &quot;activityNewIntent&quot;);</span><br><span class="line">                handleNewIntent((NewIntentData)msg.obj);</span><br><span class="line">                Trace.traceEnd(Trace.TRACE_TAG_ACTIVITY_MANAGER);</span><br><span class="line">                break;</span><br><span class="line">            case RECEIVER:</span><br><span class="line">                Trace.traceBegin(Trace.TRACE_TAG_ACTIVITY_MANAGER, &quot;broadcastReceiveComp&quot;);</span><br><span class="line">                handleReceiver((ReceiverData)msg.obj);</span><br><span class="line">                maybeSnapshot();</span><br><span class="line">                Trace.traceEnd(Trace.TRACE_TAG_ACTIVITY_MANAGER);</span><br><span class="line">                break;</span><br><span class="line">            case CREATE_SERVICE:</span><br><span class="line">                Trace.traceBegin(Trace.TRACE_TAG_ACTIVITY_MANAGER, &quot;serviceCreate&quot;);</span><br><span class="line">                handleCreateService((CreateServiceData)msg.obj);</span><br><span class="line">                Trace.traceEnd(Trace.TRACE_TAG_ACTIVITY_MANAGER);</span><br><span class="line">                break;</span><br><span class="line">            case BIND_SERVICE:</span><br><span class="line">                Trace.traceBegin(Trace.TRACE_TAG_ACTIVITY_MANAGER, &quot;serviceBind&quot;);</span><br><span class="line">                handleBindService((BindServiceData)msg.obj);</span><br><span class="line">                Trace.traceEnd(Trace.TRACE_TAG_ACTIVITY_MANAGER);</span><br><span class="line">                break;</span><br><span class="line">            case UNBIND_SERVICE:</span><br><span class="line">                Trace.traceBegin(Trace.TRACE_TAG_ACTIVITY_MANAGER, &quot;serviceUnbind&quot;);</span><br><span class="line">                handleUnbindService((BindServiceData)msg.obj);</span><br><span class="line">                Trace.traceEnd(Trace.TRACE_TAG_ACTIVITY_MANAGER);</span><br><span class="line">                break;</span><br><span class="line">            case SERVICE_ARGS:</span><br><span class="line">                Trace.traceBegin(Trace.TRACE_TAG_ACTIVITY_MANAGER, &quot;serviceStart&quot;);</span><br><span class="line">                handleServiceArgs((ServiceArgsData)msg.obj);</span><br><span class="line">                Trace.traceEnd(Trace.TRACE_TAG_ACTIVITY_MANAGER);</span><br><span class="line">                break;</span><br><span class="line">            case STOP_SERVICE:</span><br><span class="line">                Trace.traceBegin(Trace.TRACE_TAG_ACTIVITY_MANAGER, &quot;serviceStop&quot;);</span><br><span class="line">                handleStopService((IBinder)msg.obj);</span><br><span class="line">                maybeSnapshot();</span><br><span class="line">                Trace.traceEnd(Trace.TRACE_TAG_ACTIVITY_MANAGER);</span><br><span class="line">                break;</span><br><span class="line">            case REQUEST_THUMBNAIL:</span><br><span class="line">                Trace.traceBegin(Trace.TRACE_TAG_ACTIVITY_MANAGER, &quot;requestThumbnail&quot;);</span><br><span class="line">                handleRequestThumbnail((IBinder)msg.obj);</span><br><span class="line">                Trace.traceEnd(Trace.TRACE_TAG_ACTIVITY_MANAGER);</span><br><span class="line">                break;</span><br><span class="line">            case CONFIGURATION_CHANGED:</span><br><span class="line">                Trace.traceBegin(Trace.TRACE_TAG_ACTIVITY_MANAGER, &quot;configChanged&quot;);</span><br><span class="line">                mCurDefaultDisplayDpi = ((Configuration)msg.obj).densityDpi;</span><br><span class="line">                handleConfigurationChanged((Configuration)msg.obj, null);</span><br><span class="line">                Trace.traceEnd(Trace.TRACE_TAG_ACTIVITY_MANAGER);</span><br><span class="line">                break;</span><br><span class="line">            case CLEAN_UP_CONTEXT:</span><br><span class="line">                ContextCleanupInfo cci = (ContextCleanupInfo)msg.obj;</span><br><span class="line">                cci.context.performFinalCleanup(cci.who, cci.what);</span><br><span class="line">                break;</span><br><span class="line">            case GC_WHEN_IDLE:</span><br><span class="line">                scheduleGcIdler();</span><br><span class="line">                break;</span><br><span class="line">            case DUMP_SERVICE:</span><br><span class="line">                handleDumpService((DumpComponentInfo)msg.obj);</span><br><span class="line">                break;</span><br><span class="line">            case LOW_MEMORY:</span><br><span class="line">                Trace.traceBegin(Trace.TRACE_TAG_ACTIVITY_MANAGER, &quot;lowMemory&quot;);</span><br><span class="line">                handleLowMemory();</span><br><span class="line">                Trace.traceEnd(Trace.TRACE_TAG_ACTIVITY_MANAGER);</span><br><span class="line">                break;</span><br><span class="line">            case ACTIVITY_CONFIGURATION_CHANGED:</span><br><span class="line">                Trace.traceBegin(Trace.TRACE_TAG_ACTIVITY_MANAGER, &quot;activityConfigChanged&quot;);</span><br><span class="line">                handleActivityConfigurationChanged((IBinder)msg.obj);</span><br><span class="line">                Trace.traceEnd(Trace.TRACE_TAG_ACTIVITY_MANAGER);</span><br><span class="line">                break;</span><br><span class="line">            case PROFILER_CONTROL:</span><br><span class="line">                handleProfilerControl(msg.arg1 != 0, (ProfilerControlData)msg.obj, msg.arg2);</span><br><span class="line">                break;</span><br><span class="line">            case CREATE_BACKUP_AGENT:</span><br><span class="line">                Trace.traceBegin(Trace.TRACE_TAG_ACTIVITY_MANAGER, &quot;backupCreateAgent&quot;);</span><br><span class="line">                handleCreateBackupAgent((CreateBackupAgentData)msg.obj);</span><br><span class="line">                Trace.traceEnd(Trace.TRACE_TAG_ACTIVITY_MANAGER);</span><br><span class="line">                break;</span><br><span class="line">            case DESTROY_BACKUP_AGENT:</span><br><span class="line">                Trace.traceBegin(Trace.TRACE_TAG_ACTIVITY_MANAGER, &quot;backupDestroyAgent&quot;);</span><br><span class="line">                handleDestroyBackupAgent((CreateBackupAgentData)msg.obj);</span><br><span class="line">                Trace.traceEnd(Trace.TRACE_TAG_ACTIVITY_MANAGER);</span><br><span class="line">                break;</span><br><span class="line">            case SUICIDE:</span><br><span class="line">                Process.killProcess(Process.myPid());</span><br><span class="line">                break;</span><br><span class="line">            case REMOVE_PROVIDER:</span><br><span class="line">                Trace.traceBegin(Trace.TRACE_TAG_ACTIVITY_MANAGER, &quot;providerRemove&quot;);</span><br><span class="line">                completeRemoveProvider((ProviderRefCount)msg.obj);</span><br><span class="line">                Trace.traceEnd(Trace.TRACE_TAG_ACTIVITY_MANAGER);</span><br><span class="line">                break;</span><br><span class="line">            case ENABLE_JIT:</span><br><span class="line">                ensureJitEnabled();</span><br><span class="line">                break;</span><br><span class="line">            case DISPATCH_PACKAGE_BROADCAST:</span><br><span class="line">                Trace.traceBegin(Trace.TRACE_TAG_ACTIVITY_MANAGER, &quot;broadcastPackage&quot;);</span><br><span class="line">                handleDispatchPackageBroadcast(msg.arg1, (String[])msg.obj);</span><br><span class="line">                Trace.traceEnd(Trace.TRACE_TAG_ACTIVITY_MANAGER);</span><br><span class="line">                break;</span><br><span class="line">            case SCHEDULE_CRASH:</span><br><span class="line">                throw new RemoteServiceException((String)msg.obj);</span><br><span class="line">            case DUMP_HEAP:</span><br><span class="line">                handleDumpHeap(msg.arg1 != 0, (DumpHeapData)msg.obj);</span><br><span class="line">                break;</span><br><span class="line">            case DUMP_ACTIVITY:</span><br><span class="line">                handleDumpActivity((DumpComponentInfo)msg.obj);</span><br><span class="line">                break;</span><br><span class="line">            case DUMP_PROVIDER:</span><br><span class="line">                handleDumpProvider((DumpComponentInfo)msg.obj);</span><br><span class="line">                break;</span><br><span class="line">            case SLEEPING:</span><br><span class="line">                Trace.traceBegin(Trace.TRACE_TAG_ACTIVITY_MANAGER, &quot;sleeping&quot;);</span><br><span class="line">                handleSleeping((IBinder)msg.obj, msg.arg1 != 0);</span><br><span class="line">                Trace.traceEnd(Trace.TRACE_TAG_ACTIVITY_MANAGER);</span><br><span class="line">                break;</span><br><span class="line">            case SET_CORE_SETTINGS:</span><br><span class="line">                Trace.traceBegin(Trace.TRACE_TAG_ACTIVITY_MANAGER, &quot;setCoreSettings&quot;);</span><br><span class="line">                handleSetCoreSettings((Bundle) msg.obj);</span><br><span class="line">                Trace.traceEnd(Trace.TRACE_TAG_ACTIVITY_MANAGER);</span><br><span class="line">                break;</span><br><span class="line">            case UPDATE_PACKAGE_COMPATIBILITY_INFO:</span><br><span class="line">                handleUpdatePackageCompatibilityInfo((UpdateCompatibilityData)msg.obj);</span><br><span class="line">                break;</span><br><span class="line">            case TRIM_MEMORY:</span><br><span class="line">                Trace.traceBegin(Trace.TRACE_TAG_ACTIVITY_MANAGER, &quot;trimMemory&quot;);</span><br><span class="line">                handleTrimMemory(msg.arg1);</span><br><span class="line">                Trace.traceEnd(Trace.TRACE_TAG_ACTIVITY_MANAGER);</span><br><span class="line">                break;</span><br><span class="line">            case UNSTABLE_PROVIDER_DIED:</span><br><span class="line">                handleUnstableProviderDied((IBinder)msg.obj, false);</span><br><span class="line">                break;</span><br><span class="line">            case REQUEST_ASSIST_CONTEXT_EXTRAS:</span><br><span class="line">                handleRequestAssistContextExtras((RequestAssistContextExtras)msg.obj);</span><br><span class="line">                break;</span><br><span class="line">            case TRANSLUCENT_CONVERSION_COMPLETE:</span><br><span class="line">                handleTranslucentConversionComplete((IBinder)msg.obj, msg.arg1 == 1);</span><br><span class="line">                break;</span><br><span class="line">            case INSTALL_PROVIDER:</span><br><span class="line">                handleInstallProvider((ProviderInfo) msg.obj);</span><br><span class="line">                break;</span><br><span class="line">        &#125;</span><br><span class="line">        if (DEBUG_MESSAGES) Slog.v(TAG, &quot;&lt;&lt;&lt; done: &quot; + codeToString(msg.what));</span><br><span class="line">    &#125;</span><br></pre></td></tr></table></figure>
+<p>再看handlePeformLanchActivity方法, 发送一个已中止状态的进程间通信请求给ActivityThread.<br><img src="http://img.blog.csdn.net/20160812111503608" alt="这里写图片描述"></p>
+<p>以MyActivity继承为例（假定是我们app的第一个Activity），MyActivity被启动，共要经历5个大的步骤：<br>MyActivity组件是由Launcher组件来启动的，而Launcher组件又是Activity管理服务ActivityManagerService来启动的。</p>
+<p>MyActivity组件、Launcher组件和ActivityManagerService组件分别运行在不同的进程中，MyActivity启动过程就涉及了<br>三个进程，这三个进程通过Binder进程间通信来完成。</p>
+<p>Launcher组件启动MyActivity的过程如下：</p>
+<ul>
+<li><strong>Lanuncher组件向ActivityManagerService发送一个启动MyActivity组件的进程间通信请求</strong></li>
+<li><p><strong>ActivityManagerService首先将要启动的MyActivity组件的信息保存下来，然后再向Launcher组件发送一个中止状态的进程间通信请求</strong></p>
+</li>
+<li><p><strong>Launcher组件进入到中止状态后，就会向ActivityManagerService发送一个已中止状态的进程间通信请求，以便ActivityManagerService可以继续执行MyActivity组件的操作</strong></p>
+</li>
+<li><p><strong>ActivityManagerService发现用来运行MyActivity组件的应用程序不存在，因此，它就会启动一个新的应用程序进程</strong></p>
+</li>
+<li><p><strong>新的应用程序进程启动完成后，就会向ActivityManagerService发送一个启动完成的进程间通信请求，以便ActivityManagerService可以继续执行启动MyActivity组件的操作。</strong></p>
+</li>
+<li><p><strong>ActivityManagerService将第2步保存下来的MyActivity组件的信息发送给第4步创建的应用程序进程，以便它可以将yActivity组件启动起来。</strong></p>
+</li>
+</ul>
+
+          
+        
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+
+      
+
+      
+
+      
+      
+        <div class="post-eof"></div>
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+    
+      
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="https://zhanqq2010.github.io/QQzzZ.github.io/2018/01/11/插件占坑，四大组件动态注册前奏（三） 系统BroadCast的注册发送流程/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="QQzzZ">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/QQzzZ.github.io/uploads/avatar.png">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="zhanqq's Notes">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+                
+                <a class="post-title-link" href="/QQzzZ.github.io/2018/01/11/插件占坑，四大组件动态注册前奏（三） 系统BroadCast的注册发送流程/" itemprop="url">插件占坑，四大组件动态注册前奏（二） 系统Service的启动流程</a></h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2018-01-11T14:08:33+08:00">
+                2018-01-11
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        
+          
+            <p>前言：为什么要了解系统Activity，Service,BroadCastReceiver,ContentProvider的启动流程，这是一个对于即将理解插件中的四大组件动态注册，占坑的前提，如果不了解的话，那么很难了解插件hook哪些东西，又是如何骗过AMS来启动Activity,Service,BroadCastReceiver，ContentProvider？</p>
+<p>本节主要记录系统BroadCastReceiver的注册，发送流程： </p>
+<p>在了解注册，发送之前，先想一个问题：为什么有广播？</p>
+<ul>
+<li><strong>1、广播是一种组件之间传递的方式，这些组件可以运行在同一进程中，也可以运行在不同的进程中。</strong></li>
+<li><strong>2、广播的机制是建立在Binder进程间通信基础上的。在Binder进程间通信，Client组件在和Service组件进行通信之前，必须要先获取它的一个代理对象，即Client组件事先要知道Service组件的存在。然而，在广播机制中，广播发送者事先不需要知道广播接收者是存在的，这样就可以降低广播接收者和发送者之间的耦合度，得到模块分离。</strong></li>
+<li><strong>3、广播机制是一种基于消息发布和订阅的事件驱动模型，广播发送者负责发布消息，而广播接收者需要先订阅消息，然后才能收到消息。</strong></li>
+<li><strong>4、广播机制存在一个注册中心，它是由ActivityManagerService来担当的，广播接收者订阅消息的表现形式就是将自己注册到ActivieyManagerService中，并且指定要接收的广播的类型，当广播发送者向广播接收者发送一个广播时，这个广播首先发送到ActivityManagerService，然后ActivityManagerService可根据这个类型找到相应的广播接收者，最后将这个广播发送给它们处理。</strong></li>
+<li><strong>5、广播接收者的注册分为静态注册和动态注册，广播的发送方式分为有序和无序两种</strong></li>
+<li><strong>6、广播的生命周期，从对象调用它开始，到onReceiver方法执行完成之后结束。另外，每次广播被接收后会重新创建BroadcastReceiver对象，并在onReceiver方法中执行完就销毁，如果BroadcastReceiver的onReceiver方法中不能在10秒内执行完成，Android会出现ANR异常。所以不要在BroadcastReceiver的onReceiver方法中执行耗时的操作。</strong></li>
+<li><strong>7、如果需要在BroadcastReceiver中执行耗时的操作，可以通过Intent启动Service来完成。但不能绑定Service。特别是，您可能无法从一个BroadcastReceiver中显示一个对话框，或绑定到服务。对于前者，则应该使用NotificationManager的API。对于后者，你可以使用Context.startService()来启动一个Service。</strong></li>
+</ul>
+<p>##BroadCastReceiver注册流程<br>先看一张时序图：<br><img src="http://img.blog.csdn.net/20160814131305362" alt="这里写图片描述"></p>
+<p>首先得有一个广播类，以下叫MyBroadCastReceiver：</p>
+<p><img src="http://img.blog.csdn.net/20160814131656986" alt="这里写图片描述"></p>
+<p>有一个TestBroadCastActivity的类：</p>
+<p><img src="http://img.blog.csdn.net/20160814131516594" alt="这里写图片描述"></p>
+<p>通过动态注册的方式注册了一个MyBroadCastReceiver广播类，以上就是一个广播的注册过程。</p>
+<p>##BroadCastReceiver发送流程<br>先看下面两张时序图（ps：太长，只能分开截图）：发送过程远比注册过程复杂的多</p>
+<p><img src="http://img.blog.csdn.net/20160814132904100" alt="这里写图片描述"></p>
+<p><img src="http://img.blog.csdn.net/20160814132931584" alt="这里写图片描述"></p>
+<p>广播的发送过程：</p>
+<ul>
+<li><strong>1、广播发送者，即一个Activity组件或者一个service组件，将一个特定类型的广播发送给ActivityManagerService;</strong></li>
+<li>2 、ActivityManagerService接收到一个广播之后，首先找到与这个广播对应的广播接收者，然后将他们添加一个广播调度队列中，最后向<br>ActivityManagerService发送一个类型为BROADCAST_INTENT_MSG的值，这时广播对发送者来说，一个广播发送过程就完成了;</li>
+<li><strong>3、当发送到ActivityManagerService所运行的线程的消息队列中BROADCAST_INTENT_MSG消息被处理时，ActivityManagerService就会从广播调度队列中找到需要的广播的接收者，并且将对应的广播发送给它们所运行的应用程序进程。</strong></li>
+<li><strong>4、广播接收者所运行在的应用程序进程接收到ActivityManagerService发送过来的广播之后，并不是直接将接受到的广播分发给广播接收者来处理，而是将接收到的广播封装成一个消息，并且发送到主线程的消息队列中，当这个消息被处理时，应用程序进程才会将它所描述的广播发送给相应的广播接收者处理。</strong></li>
+<li><strong>5、ActivityManagerService向一个应用程序发送一个广播时，采用的是异步进程间通信,Binder驱动结构体中binder_node时提到，发送给一一个Binder实体对象的所有异步事务都是保存在一个异步事务队列中的，由于保存在一个异步事务队列中的异步事务在同一时刻只有一个会得到处理，即只有位于队列头部的异步事务才会得到处理，因为，ActivityManagerService就可以保证它发送给同一个应用程序的所有都可以按照发送顺序来串行地接收和处理。</strong></li>
+</ul>
+<p>以上就是广播的注册发送过程，ContentProvider不再分析，下篇将正式进入插件占坑，四大组件动态化注册分析。</p>
+
+          
+        
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+
+      
+
+      
+
+      
+      
+        <div class="post-eof"></div>
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+    
+      
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
     <link itemprop="mainEntityOfPage" href="https://zhanqq2010.github.io/QQzzZ.github.io/2018/01/11/Service插件化/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
@@ -475,1036 +1734,13 @@
 
 
     
-      
-
-  
-
-  
-  
-  
-
-  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
-  
-  
-  
-  <div class="post-block">
-    <link itemprop="mainEntityOfPage" href="https://zhanqq2010.github.io/QQzzZ.github.io/2018/01/11/Hook机制之Binder-Hook/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="name" content="QQzzZ">
-      <meta itemprop="description" content="">
-      <meta itemprop="image" content="/QQzzZ.github.io/uploads/avatar.png">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="zhanqq's Notes">
-    </span>
-
-    
-      <header class="post-header">
-
-        
-        
-          <h1 class="post-title" itemprop="name headline">
-                
-                <a class="post-title-link" href="/QQzzZ.github.io/2018/01/11/Hook机制之Binder-Hook/" itemprop="url">Android插件化原理解析——Hook机制之Binder-Hook</a></h1>
-        
-
-        <div class="post-meta">
-          <span class="post-time">
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-calendar-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">发表于</span>
-              
-              <time title="创建于" itemprop="dateCreated datePublished" datetime="2018-01-11T12:03:39+08:00">
-                2018-01-11
-              </time>
-            
-
-            
-
-            
-          </span>
-
-          
-
-          
-            
-          
-
-          
-          
-
-          
-
-          
-
-          
-
-        </div>
-      </header>
-    
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-      
-
-      
-        
-          <h1 id="Hook机制之Binder-Hook"><a href="#Hook机制之Binder-Hook" class="headerlink" title="Hook机制之Binder-Hook"></a>Hook机制之Binder-Hook</h1><p>Android系统通过Binder机制给应用程序提供了一系列的系统服务，诸如<code>ActivityManagerService</code>，<code>ClipboardManager</code>， <code>AudioManager</code>等；这些广泛存在系统服务给应用程序提供了诸如任务管理，音频，视频等异常强大的功能。</p>
-<p>插件框架作为各个插件的管理者，为了使得插件能够<strong>无缝地</strong>使用这些系统服务，自然会对这些系统服务做出一定的改造(Hook)，使得插件的开发和使用更加方便，从而大大降低插件的开发和维护成本。比如，Hook住<code>ActivityManagerService</code>可以让插件无缝地使用<code>startActivity</code>方法而不是使用特定的方式(比如that语法)来启动插件或者主程序的任意界面。</p>
-<p>我们把这种Hook系统服务的机制称之为Binder Hook，因为本质上这些服务提供者都是存在于系统各个进程的Binder对象。因此，要理解接下来的内容必须了解Android的Binder机制，可以参考我之前的文章<a href="http://weishu.me/2016/01/12/binder-index-for-newer/" target="_blank" rel="noopener">Binder学习指南</a></p>
-          <!--noindex-->
-          <div class="post-button text-center">
-            <a class="btn" href="/QQzzZ.github.io/2018/01/11/Hook机制之Binder-Hook/#more" rel="contents">
-              阅读全文 &raquo;
-            </a>
-          </div>
-          <!--/noindex-->
-        
-      
-    </div>
-    
-    
-    
-
-    
-
-    
-
-    
-
-    <footer class="post-footer">
-      
-
-      
-
-      
-
-      
-      
-        <div class="post-eof"></div>
-      
-    </footer>
-  </div>
-  
-  
-  
-  </article>
-
-
-    
-      
-
-  
-
-  
-  
-  
-
-  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
-  
-  
-  
-  <div class="post-block">
-    <link itemprop="mainEntityOfPage" href="https://zhanqq2010.github.io/QQzzZ.github.io/2018/01/11/Hook机制之AMS&PMS/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="name" content="QQzzZ">
-      <meta itemprop="description" content="">
-      <meta itemprop="image" content="/QQzzZ.github.io/uploads/avatar.png">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="zhanqq's Notes">
-    </span>
-
-    
-      <header class="post-header">
-
-        
-        
-          <h1 class="post-title" itemprop="name headline">
-                
-                <a class="post-title-link" href="/QQzzZ.github.io/2018/01/11/Hook机制之AMS&PMS/" itemprop="url">Android插件化原理解析——Hook机制之AMS&PMS</a></h1>
-        
-
-        <div class="post-meta">
-          <span class="post-time">
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-calendar-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">发表于</span>
-              
-              <time title="创建于" itemprop="dateCreated datePublished" datetime="2018-01-11T12:03:39+08:00">
-                2018-01-11
-              </time>
-            
-
-            
-
-            
-          </span>
-
-          
-
-          
-            
-          
-
-          
-          
-
-          
-
-          
-
-          
-
-        </div>
-      </header>
-    
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-      
-
-      
-        
-          <h1 id="Hook机制之AMS-amp-PMS"><a href="#Hook机制之AMS-amp-PMS" class="headerlink" title="Hook机制之AMS&amp;PMS"></a>Hook机制之AMS&amp;PMS</h1><p>在前面的文章中我们介绍了DroidPlugin的Hook机制，也就是<strong>代理方式</strong>和<strong>Binder Hook</strong>；插件框架通过AOP实现了插件使用和开发的透明性。在讲述DroidPlugin如何实现四大组件的插件化之前，有必要说明一下它对ActivityManagerServiche以及PackageManagerService的Hook方式（以下简称AMS，PMS）。</p>
-<p>ActivityManagerService对于FrameWork层的重要性不言而喻，Android的四大组件无一不与它打交道：</p>
-<ol>
-<li><code>startActivity</code>最终调用了AMS的<code>startActivity</code>系列方法，实现了Activity的启动；Activity的生命周期回调，也在AMS中完成；</li>
-<li><code>startService,bindService</code>最终调用到AMS的startService和bindService方法；</li>
-<li>动态广播的注册和接收在<code>AMS</code>中完成（静态广播在<code>PMS</code>中完成）</li>
-<li><code>getContentResolver</code>最终从<code>AMS</code>的<code>getContentProvider</code>获取到ContentProvider</li>
-</ol>
-<p>而<code>PMS</code>则完成了诸如权限校捡(<code>checkPermission,checkUidPermission</code>)，Apk meta信息获取(<code>getApplicationInfo</code>等)，四大组件信息获取(<code>query</code>系列方法)等重要功能。</p>
-<p>在上文<a href="Hook机制之Binder-Hook.md">Android插件化原理解析——Hook机制之Binder Hook</a>中讲述了DroidPlugin的Binder Hook机制；我们知道<code>AMS</code>和<code>PMS</code>就是以Binder方式提供给应用程序使用的系统服务，理论上我们也可以采用这种方式Hook掉它们。但是由于这两者使用得如此频繁，Framework给他们了一些“特别优待”，这也给了我们相对于Binder Hook更加稳定可靠的hook方式。</p>
-          <!--noindex-->
-          <div class="post-button text-center">
-            <a class="btn" href="/QQzzZ.github.io/2018/01/11/Hook机制之AMS&PMS/#more" rel="contents">
-              阅读全文 &raquo;
-            </a>
-          </div>
-          <!--/noindex-->
-        
-      
-    </div>
-    
-    
-    
-
-    
-
-    
-
-    
-
-    <footer class="post-footer">
-      
-
-      
-
-      
-
-      
-      
-        <div class="post-eof"></div>
-      
-    </footer>
-  </div>
-  
-  
-  
-  </article>
-
-
-    
-      
-
-  
-
-  
-  
-  
-
-  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
-  
-  
-  
-  <div class="post-block">
-    <link itemprop="mainEntityOfPage" href="https://zhanqq2010.github.io/QQzzZ.github.io/2018/01/11/ContentProvider插件化/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="name" content="QQzzZ">
-      <meta itemprop="description" content="">
-      <meta itemprop="image" content="/QQzzZ.github.io/uploads/avatar.png">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="zhanqq's Notes">
-    </span>
-
-    
-      <header class="post-header">
-
-        
-        
-          <h1 class="post-title" itemprop="name headline">
-                
-                <a class="post-title-link" href="/QQzzZ.github.io/2018/01/11/ContentProvider插件化/" itemprop="url">Android插件化原理解析——ContentProvider插件化</a></h1>
-        
-
-        <div class="post-meta">
-          <span class="post-time">
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-calendar-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">发表于</span>
-              
-              <time title="创建于" itemprop="dateCreated datePublished" datetime="2018-01-11T12:03:39+08:00">
-                2018-01-11
-              </time>
-            
-
-            
-
-            
-          </span>
-
-          
-
-          
-            
-          
-
-          
-          
-
-          
-
-          
-
-          
-
-        </div>
-      </header>
-    
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-      
-
-      
-        
-          <h1 id="ContentProvider插件化"><a href="#ContentProvider插件化" class="headerlink" title="ContentProvider插件化"></a>ContentProvider插件化</h1><p>目前为止我们已经完成了Android四大组件中Activity，Service以及BroadcastReceiver的插件化，这几个组件各不相同，我们根据它们的特点定制了不同的插件化方案；那么对于ContentProvider，它又有什么特点？应该如何实现它的插件化？</p>
-<p>与Activity，BroadcastReceiver等频繁被使用的组件不同，我们接触和使用ContentProvider的机会要少得多；但是，ContentProvider这个组件对于Android系统有着特别重要的作用——作为一种极其方便的<strong>数据共享</strong>的手段，ContentProvider使得广大第三方App能够在壁垒森严的系统中自由呼吸。</p>
-<p>在Android系统中，每一个应用程序都有自己的用户ID，而每一个应用程序所创建的文件的读写权限都是只赋予给自己所属的用户，这就限制了应用程序之间相互读写数据的操作。应用程序之间如果希望能够进行交互，只能采取跨进程通信的方式；Binder机制能够满足一般的IPC需求，但是如果应用程序之间需要共享大量数据，单纯使用Binder是很难办到的——我相信大家对于Binder 1M缓冲区以及TransactionTooLargeException一定不陌生；ContentProvider使用了匿名共享内存(Ashmem)机制完成数据共享，因此它可以很方便地完成大量数据的传输。Android系统的短信，联系人，相册，媒体库等等一系列的基础功能都依赖与ContentProvider，它的重要性可见一斑。</p>
-<p>既然ContentProvider的核心特性是数据共享，那么要实现它的插件化，必须能让插件能够把它的ContentProvider共享给系统——如果不能「<strong>provide content</strong>」那还叫什么ContentProvider？</p>
-<p>但是，如果回想一下Activity等组件的插件化方式，在涉及到「共享」这个问题上，一直没有较好的解决方案：<br>
-          <!--noindex-->
-          <div class="post-button text-center">
-            <a class="btn" href="/QQzzZ.github.io/2018/01/11/ContentProvider插件化/#more" rel="contents">
-              阅读全文 &raquo;
-            </a>
-          </div>
-          <!--/noindex-->
-        
-      
-    </div>
-    
-    
-    
-
-    
-
-    
-
-    
-
-    <footer class="post-footer">
-      
-
-      
-
-      
-
-      
-      
-        <div class="post-eof"></div>
-      
-    </footer>
-  </div>
-  
-  
-  
-  </article>
-
-
-    
-      
-
-  
-
-  
-  
-  
-
-  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
-  
-  
-  
-  <div class="post-block">
-    <link itemprop="mainEntityOfPage" href="https://zhanqq2010.github.io/QQzzZ.github.io/2018/01/11/ClassLoader管理/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="name" content="QQzzZ">
-      <meta itemprop="description" content="">
-      <meta itemprop="image" content="/QQzzZ.github.io/uploads/avatar.png">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="zhanqq's Notes">
-    </span>
-
-    
-      <header class="post-header">
-
-        
-        
-          <h1 class="post-title" itemprop="name headline">
-                
-                <a class="post-title-link" href="/QQzzZ.github.io/2018/01/11/ClassLoader管理/" itemprop="url">Android插件化原理解析——插件加载机制</a></h1>
-        
-
-        <div class="post-meta">
-          <span class="post-time">
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-calendar-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">发表于</span>
-              
-              <time title="创建于" itemprop="dateCreated datePublished" datetime="2018-01-11T12:03:39+08:00">
-                2018-01-11
-              </time>
-            
-
-            
-
-            
-          </span>
-
-          
-
-          
-            
-          
-
-          
-          
-
-          
-
-          
-
-          
-
-        </div>
-      </header>
-    
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-      
-
-      
-        
-          <h1 id="插件加载机制"><a href="#插件加载机制" class="headerlink" title="插件加载机制"></a>插件加载机制</h1><p>上文 <a href="Activity生命周期管理.md">Activity生命周期管理</a> 中我们地完成了『启动没有在AndroidManifest.xml中显式声明的Activity』的任务；通过Hook <code>AMS</code>和拦截ActivityThread中<code>H</code>类对于组件调度我们成功地绕过了AndroidMAnifest.xml的限制。</p>
-<p>但是我们启动的『没有在AndroidManifet.xml中显式声明』的Activity和宿主程序存在于同一个Apk中；通常情况下，插件均以独立的文件存在甚至通过网络获取，这时候插件中的Activity能否成功启动呢？</p>
-<p>要启动Activity组件肯定先要创建对应的Activity类的对象，从上文 <a href="Activity生命周期管理.md">Activity生命周期管理</a> 知道，创建Activity类对象的过程如下：</p>
-<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">java.lang.ClassLoader cl = r.packageInfo.getClassLoader();</span><br><span class="line">activity = mInstrumentation.newActivity(</span><br><span class="line">        cl, component.getClassName(), r.intent);</span><br><span class="line">StrictMode.incrementExpectedActivityCount(activity.getClass());</span><br><span class="line">r.intent.setExtrasClassLoader(cl);</span><br></pre></td></tr></table></figure>
-<p>也就是说，系统通过<code>ClassLoader</code>加载了需要的Activity类并通过反射调用构造函数创建出了Activity对象。如果Activity组件存在于独立于宿主程序的文件之中，系统的ClassLoader怎么知道去哪里加载呢？因此，如果不做额外的处理，插件中的Activity对象甚至都没有办法创建出来，谈何启动？</p>
-<p>因此，要使存在于独立文件或者网络中的插件被成功启动，首先就需要解决这个<strong>插件类加载</strong>的问题。<br>下文将围绕此问题展开，完成『启动没有在AndroidManifest.xml中显示声明，并且存在于外部插件中的Activity』的任务。</p>
-<p>阅读本文之前，可以先clone一份 <a href="https://github.com/tiann/understand-plugin-framework" target="_blank" rel="noopener">understand-plugin-framework</a>，参考此项目的<code>classloader-hook</code> 模块。另外，插件框架原理解析系列文章见<a href="概述.md">索引</a>。</p>
-          <!--noindex-->
-          <div class="post-button text-center">
-            <a class="btn" href="/QQzzZ.github.io/2018/01/11/ClassLoader管理/#more" rel="contents">
-              阅读全文 &raquo;
-            </a>
-          </div>
-          <!--/noindex-->
-        
-      
-    </div>
-    
-    
-    
-
-    
-
-    
-
-    
-
-    <footer class="post-footer">
-      
-
-      
-
-      
-
-      
-      
-        <div class="post-eof"></div>
-      
-    </footer>
-  </div>
-  
-  
-  
-  </article>
-
-
-    
-      
-
-  
-
-  
-  
-  
-
-  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
-  
-  
-  
-  <div class="post-block">
-    <link itemprop="mainEntityOfPage" href="https://zhanqq2010.github.io/QQzzZ.github.io/2018/01/11/BroadcastReceiver插件化/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="name" content="QQzzZ">
-      <meta itemprop="description" content="">
-      <meta itemprop="image" content="/QQzzZ.github.io/uploads/avatar.png">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="zhanqq's Notes">
-    </span>
-
-    
-      <header class="post-header">
-
-        
-        
-          <h1 class="post-title" itemprop="name headline">
-                
-                <a class="post-title-link" href="/QQzzZ.github.io/2018/01/11/BroadcastReceiver插件化/" itemprop="url">Android插件化原理解析——BroadcastReceiver插件化</a></h1>
-        
-
-        <div class="post-meta">
-          <span class="post-time">
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-calendar-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">发表于</span>
-              
-              <time title="创建于" itemprop="dateCreated datePublished" datetime="2018-01-11T12:03:39+08:00">
-                2018-01-11
-              </time>
-            
-
-            
-
-            
-          </span>
-
-          
-
-          
-            
-          
-
-          
-          
-
-          
-
-          
-
-          
-
-        </div>
-      </header>
-    
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-      
-
-      
-        
-          <h1 id="BroadcastReceiver插件化"><a href="#BroadcastReceiver插件化" class="headerlink" title="BroadcastReceiver插件化"></a>BroadcastReceiver插件化</h1><p>在<a href="Activity生命周期管理.md">Activity生命周期管理</a> 以及 <a href="ClassLoader管理.md">插件加载机制</a> 中我们详细讲述了插件化过程中对于Activity组件的处理方式，为了实现Activity的插件化我们付出了相当多的努力；那么Android系统的其他组件，比如BroadcastReceiver，Service还有ContentProvider，它们又该如何处理呢？</p>
-<p>相比Activity，BroadcastReceiver要简单很多——广播的生命周期相当简单；如果希望插件能够支持广播，这意味着什么？</p>
-<p>回想一下我们日常开发的时候是如何使用BroadcastReceiver的：<strong>注册</strong>, <strong>发送</strong>和<strong>接收</strong>；因此，要实现BroadcastReceiver的插件化就这三种操作提供支持；接下来我们将一步步完成这个过程。</p>
-<p>阅读本文之前，可以先clone一份 <a href="https://github.com/tiann/understand-plugin-framework" target="_blank" rel="noopener">understand-plugin-framework</a>，参考此项目的<code>receiver-management</code> 模块。另外，插件框架原理解析系列文章见<a href="概述.md">索引</a>。</p>
-          <!--noindex-->
-          <div class="post-button text-center">
-            <a class="btn" href="/QQzzZ.github.io/2018/01/11/BroadcastReceiver插件化/#more" rel="contents">
-              阅读全文 &raquo;
-            </a>
-          </div>
-          <!--/noindex-->
-        
-      
-    </div>
-    
-    
-    
-
-    
-
-    
-
-    
-
-    <footer class="post-footer">
-      
-
-      
-
-      
-
-      
-      
-        <div class="post-eof"></div>
-      
-    </footer>
-  </div>
-  
-  
-  
-  </article>
-
-
-    
-      
-
-  
-
-  
-  
-  
-
-  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
-  
-  
-  
-  <div class="post-block">
-    <link itemprop="mainEntityOfPage" href="https://zhanqq2010.github.io/QQzzZ.github.io/2018/01/11/Activity生命周期管理/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="name" content="QQzzZ">
-      <meta itemprop="description" content="">
-      <meta itemprop="image" content="/QQzzZ.github.io/uploads/avatar.png">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="zhanqq's Notes">
-    </span>
-
-    
-      <header class="post-header">
-
-        
-        
-          <h1 class="post-title" itemprop="name headline">
-                
-                <a class="post-title-link" href="/QQzzZ.github.io/2018/01/11/Activity生命周期管理/" itemprop="url">Android插件化原理解析——Activity生命周期管理</a></h1>
-        
-
-        <div class="post-meta">
-          <span class="post-time">
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-calendar-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">发表于</span>
-              
-              <time title="创建于" itemprop="dateCreated datePublished" datetime="2018-01-11T12:03:39+08:00">
-                2018-01-11
-              </time>
-            
-
-            
-
-            
-          </span>
-
-          
-
-          
-            
-          
-
-          
-          
-
-          
-
-          
-
-          
-
-        </div>
-      </header>
-    
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-      
-
-      
-        
-          <h1 id="Activity生命周期管理"><a href="#Activity生命周期管理" class="headerlink" title="Activity生命周期管理"></a>Activity生命周期管理</h1><p>之前的 <a href="概述.md">Android插件化原理解析</a> 系列文章揭开了Hook机制的神秘面纱，现在我们手握倚天屠龙，那么如何通过这种技术完成插件化方案呢？具体来说，插件中的Activity，Service等组件如何在Android系统上运行起来？</p>
-<p>在Java平台要做到动态运行模块、热插拔可以使用<code>ClassLoader</code>技术进行动态类加载，比如广泛使用的<code>OSGi</code>技术。在Android上当然也可以使用动态加载技术，但是仅仅把类加载进来就足够了吗？<code>Activity</code>，<code>Service</code>等组件是有生命周期的，它们统一由系统服务<code>AMS</code>管理；使用<code>ClassLoader</code>可以从插件中创建Activity对象，但是，一个没有生命周期的Activity对象有什么用？所以在Android系统上，仅仅完成动态类加载是不够的；我们需要想办法把我们加载进来的Activity等组件交给系统管理，让<code>AMS</code>赋予组件生命周期；这样才算是一个有血有肉的完善的插件化方案。</p>
-<p>接下来的系列文章会讲述 DroidPlugin对于Android四大组件的处理方式，我们且看它如何采用Hook技术坑蒙拐骗把系统玩弄于股掌之中，最终赋予Activity，Service等组件生命周期，完成借尸还魂的。</p>
-          <!--noindex-->
-          <div class="post-button text-center">
-            <a class="btn" href="/QQzzZ.github.io/2018/01/11/Activity生命周期管理/#more" rel="contents">
-              阅读全文 &raquo;
-            </a>
-          </div>
-          <!--/noindex-->
-        
-      
-    </div>
-    
-    
-    
-
-    
-
-    
-
-    
-
-    <footer class="post-footer">
-      
-
-      
-
-      
-
-      
-      
-        <div class="post-eof"></div>
-      
-    </footer>
-  </div>
-  
-  
-  
-  </article>
-
-
-    
-      
-
-  
-
-  
-  
-  
-
-  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
-  
-  
-  
-  <div class="post-block">
-    <link itemprop="mainEntityOfPage" href="https://zhanqq2010.github.io/QQzzZ.github.io/2018/01/11/概述/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="name" content="QQzzZ">
-      <meta itemprop="description" content="">
-      <meta itemprop="image" content="/QQzzZ.github.io/uploads/avatar.png">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="zhanqq's Notes">
-    </span>
-
-    
-      <header class="post-header">
-
-        
-        
-          <h1 class="post-title" itemprop="name headline">
-                
-                <a class="post-title-link" href="/QQzzZ.github.io/2018/01/11/概述/" itemprop="url">Android插件化原理解析——概要</a></h1>
-        
-
-        <div class="post-meta">
-          <span class="post-time">
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-calendar-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">发表于</span>
-              
-              <time title="创建于" itemprop="dateCreated datePublished" datetime="2018-01-11T11:53:35+08:00">
-                2018-01-11
-              </time>
-            
-
-            
-
-            
-          </span>
-
-          
-
-          
-            
-          
-
-          
-          
-
-          
-
-          
-
-          
-
-        </div>
-      </header>
-    
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-      
-
-      
-        
-          <h1 id="概要"><a href="#概要" class="headerlink" title="概要"></a>概要</h1><p>2015年是Android插件化技术突飞猛进的一年，随着业务的发展各大厂商都碰到了Android Native平台的瓶颈：</p>
-<ol>
-<li>从技术上讲，业务逻辑的复杂导致代码量急剧膨胀，各大厂商陆续出到65535方法数的天花板；同时，运营为王的时代对于模块热更新提出了更高的要求。</li>
-<li>在业务层面上，功能模块的解耦以及维护团队的分离也是大势所趋；各个团队维护着同一个App的不同模块，如果每个模块升级新功能都需要对整个app进行升级，那么发布流程不仅复杂而且效率低下；在讲究小步快跑和持续迭代的移动互联网必将遭到淘汰。</li>
-</ol>
-<p>H5和Hybird可以解决这些问题，但是始终比不上native的用户体验；于是，国外的FaceBook推出了<code>react-native</code>；而国内各大厂商几乎都选择纯native的插件化技术。可以说，Android的未来必将是<code>react-native</code>和插件化的天下。</p>
-          <!--noindex-->
-          <div class="post-button text-center">
-            <a class="btn" href="/QQzzZ.github.io/2018/01/11/概述/#more" rel="contents">
-              阅读全文 &raquo;
-            </a>
-          </div>
-          <!--/noindex-->
-        
-      
-    </div>
-    
-    
-    
-
-    
-
-    
-
-    
-
-    <footer class="post-footer">
-      
-
-      
-
-      
-
-      
-      
-        <div class="post-eof"></div>
-      
-    </footer>
-  </div>
-  
-  
-  
-  </article>
-
-
-    
-      
-
-  
-
-  
-  
-  
-
-  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
-  
-  
-  
-  <div class="post-block">
-    <link itemprop="mainEntityOfPage" href="https://zhanqq2010.github.io/QQzzZ.github.io/2018/01/10/hello-world/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="name" content="QQzzZ">
-      <meta itemprop="description" content="">
-      <meta itemprop="image" content="/QQzzZ.github.io/uploads/avatar.png">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="zhanqq's Notes">
-    </span>
-
-    
-      <header class="post-header">
-
-        
-        
-          <h1 class="post-title" itemprop="name headline">
-                
-                <a class="post-title-link" href="/QQzzZ.github.io/2018/01/10/hello-world/" itemprop="url">Hello World</a></h1>
-        
-
-        <div class="post-meta">
-          <span class="post-time">
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-calendar-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">发表于</span>
-              
-              <time title="创建于" itemprop="dateCreated datePublished" datetime="2018-01-10T10:20:33+08:00">
-                2018-01-10
-              </time>
-            
-
-            
-
-            
-          </span>
-
-          
-
-          
-            
-          
-
-          
-          
-
-          
-
-          
-
-          
-
-        </div>
-      </header>
-    
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-      
-
-      
-        
-          
-            <p>Welcome to <a href="https://hexo.io/" target="_blank" rel="noopener">Hexo</a>! This is your very first post. Check <a href="https://hexo.io/docs/" target="_blank" rel="noopener">documentation</a> for more info. If you get any problems when using Hexo, you can find the answer in <a href="https://hexo.io/docs/troubleshooting.html" target="_blank" rel="noopener">troubleshooting</a> or you can ask me on <a href="https://github.com/hexojs/hexo/issues" target="_blank" rel="noopener">GitHub</a>.</p>
-<h2 id="Quick-Start"><a href="#Quick-Start" class="headerlink" title="Quick Start"></a>Quick Start</h2><h3 id="Create-a-new-post"><a href="#Create-a-new-post" class="headerlink" title="Create a new post"></a>Create a new post</h3><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">$ hexo new <span class="string">"My New Post"</span></span><br></pre></td></tr></table></figure>
-<p>More info: <a href="https://hexo.io/docs/writing.html" target="_blank" rel="noopener">Writing</a></p>
-<h3 id="Run-server"><a href="#Run-server" class="headerlink" title="Run server"></a>Run server</h3><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">$ hexo server</span><br></pre></td></tr></table></figure>
-<p>More info: <a href="https://hexo.io/docs/server.html" target="_blank" rel="noopener">Server</a></p>
-<h3 id="Generate-static-files"><a href="#Generate-static-files" class="headerlink" title="Generate static files"></a>Generate static files</h3><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">$ hexo generate</span><br></pre></td></tr></table></figure>
-<p>More info: <a href="https://hexo.io/docs/generating.html" target="_blank" rel="noopener">Generating</a></p>
-<h3 id="Deploy-to-remote-sites"><a href="#Deploy-to-remote-sites" class="headerlink" title="Deploy to remote sites"></a>Deploy to remote sites</h3><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">$ hexo deploy</span><br></pre></td></tr></table></figure>
-<p>More info: <a href="https://hexo.io/docs/deployment.html" target="_blank" rel="noopener">Deployment</a></p>
-
-          
-        
-      
-    </div>
-    
-    
-    
-
-    
-
-    
-
-    
-
-    <footer class="post-footer">
-      
-
-      
-
-      
-
-      
-      
-        <div class="post-eof"></div>
-      
-    </footer>
-  </div>
-  
-  
-  
-  </article>
-
-
-    
   </section>
 
   
+  <nav class="pagination">
+    <span class="page-number current">1</span><a class="page-number" href="/QQzzZ.github.io/page/2/">2</a><a class="extend next" rel="next" href="/QQzzZ.github.io/page/2/"><i class="fa fa-angle-right"></i></a>
+  </nav>
+
 
 
           </div>
@@ -1552,7 +1788,7 @@
               
                 <a href="/QQzzZ.github.io/archives/">
               
-                  <span class="site-state-item-count">10</span>
+                  <span class="site-state-item-count">18</span>
                   <span class="site-state-item-name">日志</span>
                 </a>
               </div>

@@ -1,0 +1,722 @@
+<!DOCTYPE html>
+
+
+
+  
+
+
+<html class="theme-next mist use-motion" lang="zh-Hans">
+<head>
+  <meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+<meta name="theme-color" content="#222">
+
+
+
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/QQzzZ.github.io/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css" />
+
+
+
+
+
+
+
+<link href="/QQzzZ.github.io/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css" />
+
+<link href="/QQzzZ.github.io/css/main.css?v=5.1.4" rel="stylesheet" type="text/css" />
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/QQzzZ.github.io/images/apple-touch-icon-next.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="32x32" href="/QQzzZ.github.io/images/favicon-32x32-next.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="16x16" href="/QQzzZ.github.io/images/favicon-16x16-next.png?v=5.1.4">
+
+
+  <link rel="mask-icon" href="/QQzzZ.github.io/images/logo.svg?v=5.1.4" color="#222">
+
+
+
+
+
+  <meta name="keywords" content="Hexo, NexT" />
+
+
+
+
+
+  <link rel="alternate" href="/QQzzZ.github.io/atom.xml" title="zhanqq's Notes" type="application/atom+xml" />
+
+
+
+
+
+
+<meta name="description" content="在了解系统的activity，service，broadcastReceiver的启动过程后，今天将分析下360 DroidPlugin是如何预注册占坑的？本篇文章主要分析Service预注册占坑，Service占了坑后又是什么时候开始瞒天过海欺骗AMS的？先看下Agenda：  AndroidManifest.xml中概览 Service中关键方法被hook时机 startService被hoo">
+<meta property="og:type" content="article">
+<meta property="og:title" content="插件开发之360 DroidPlugin源码分析（五）Service预注册占坑">
+<meta property="og:url" content="https://zhanqq2010.github.io/2018/01/11/插件开发之360 DroidPlugin源码分析（五）Service预注册占坑/index.html">
+<meta property="og:site_name" content="zhanqq&#39;s Notes">
+<meta property="og:description" content="在了解系统的activity，service，broadcastReceiver的启动过程后，今天将分析下360 DroidPlugin是如何预注册占坑的？本篇文章主要分析Service预注册占坑，Service占了坑后又是什么时候开始瞒天过海欺骗AMS的？先看下Agenda：  AndroidManifest.xml中概览 Service中关键方法被hook时机 startService被hoo">
+<meta property="og:locale" content="zh-Hans">
+<meta property="og:image" content="http://img.blog.csdn.net/20160821023438578">
+<meta property="og:image" content="http://img.blog.csdn.net/20160821025123414">
+<meta property="og:image" content="http://img.blog.csdn.net/20160821025156117">
+<meta property="og:image" content="http://img.blog.csdn.net/20160821025222023">
+<meta property="og:image" content="http://img.blog.csdn.net/20160821025241211">
+<meta property="og:image" content="http://img.blog.csdn.net/20160821025303415">
+<meta property="og:image" content="http://img.blog.csdn.net/20160821025323853">
+<meta property="og:image" content="http://img.blog.csdn.net/20160821025349024">
+<meta property="og:image" content="http://img.blog.csdn.net/20160821025410931">
+<meta property="og:image" content="http://img.blog.csdn.net/20160821025431244">
+<meta property="og:image" content="http://img.blog.csdn.net/20160821025448183">
+<meta property="og:image" content="http://img.blog.csdn.net/20160821025514512">
+<meta property="og:image" content="http://img.blog.csdn.net/20160821025554495">
+<meta property="og:image" content="http://img.blog.csdn.net/20160821033205794">
+<meta property="og:image" content="http://img.blog.csdn.net/20160821025616886">
+<meta property="og:image" content="http://img.blog.csdn.net/20160821025639136">
+<meta property="og:image" content="http://img.blog.csdn.net/20160821025700683">
+<meta property="og:image" content="http://img.blog.csdn.net/20160821025721230">
+<meta property="og:image" content="http://img.blog.csdn.net/20160821025737074">
+<meta property="og:image" content="http://img.blog.csdn.net/20160821025803184">
+<meta property="og:updated_time" content="2018-01-11T06:11:25.428Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="插件开发之360 DroidPlugin源码分析（五）Service预注册占坑">
+<meta name="twitter:description" content="在了解系统的activity，service，broadcastReceiver的启动过程后，今天将分析下360 DroidPlugin是如何预注册占坑的？本篇文章主要分析Service预注册占坑，Service占了坑后又是什么时候开始瞒天过海欺骗AMS的？先看下Agenda：  AndroidManifest.xml中概览 Service中关键方法被hook时机 startService被hoo">
+<meta name="twitter:image" content="http://img.blog.csdn.net/20160821023438578">
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/QQzzZ.github.io/',
+    scheme: 'Mist',
+    version: '5.1.4',
+    sidebar: {"position":"left","display":"post","offset":12,"b2t":false,"scrollpercent":false,"onmobile":false},
+    fancybox: true,
+    tabs: true,
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    duoshuo: {
+      userId: '0',
+      author: '博主'
+    },
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+
+  <link rel="canonical" href="https://zhanqq2010.github.io/2018/01/11/插件开发之360 DroidPlugin源码分析（五）Service预注册占坑/"/>
+
+
+
+
+
+  <title>插件开发之360 DroidPlugin源码分析（五）Service预注册占坑 | zhanqq's Notes</title>
+  
+
+
+
+
+
+
+
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail">
+    <div class="headband"></div>
+	<a href="https://github.com/zhanqq2010" class="github-corner" aria-label="View source on Github"><svg width="80" height="80" viewBox="0 0 250 250" style="fill:#151513; color:#fff; position: absolute; top: 0; border: 0; right: 0;" aria-hidden="true"><path d="M0,0 L115,115 L130,115 L142,142 L250,250 L250,0 Z"></path><path d="M128.3,109.0 C113.8,99.7 119.0,89.6 119.0,89.6 C122.0,82.7 120.5,78.6 120.5,78.6 C119.2,72.0 123.4,76.3 123.4,76.3 C127.3,80.9 125.5,87.3 125.5,87.3 C122.9,97.6 130.6,101.9 134.4,103.2" fill="currentColor" style="transform-origin: 130px 106px;" class="octo-arm"></path><path d="M115.0,115.0 C114.9,115.1 118.7,116.5 119.8,115.4 L133.7,101.6 C136.9,99.2 139.9,98.4 142.2,98.6 C133.8,88.0 127.5,74.4 143.8,58.0 C148.5,53.4 154.0,51.2 159.7,51.0 C160.3,49.4 163.2,43.6 171.4,40.1 C171.4,40.1 176.1,42.5 178.8,56.2 C183.1,58.6 187.2,61.8 190.9,65.4 C194.5,69.0 197.7,73.2 200.1,77.6 C213.8,80.2 216.3,84.9 216.3,84.9 C212.7,93.1 206.9,96.0 205.4,96.6 C205.1,102.4 203.0,107.8 198.3,112.5 C181.9,128.9 168.3,122.5 157.7,114.1 C157.9,116.9 156.7,120.9 152.7,124.9 L141.0,136.5 C139.8,137.7 141.6,141.9 141.8,141.8 Z" fill="currentColor" class="octo-body"></path></svg></a><style>.github-corner:hover .octo-arm{animation:octocat-wave 560ms ease-in-out}@keyframes octocat-wave{0%,100%{transform:rotate(0)}20%,60%{transform:rotate(-25deg)}40%,80%{transform:rotate(10deg)}}@media (max-width:500px){.github-corner:hover .octo-arm{animation:none}.github-corner .octo-arm{animation:octocat-wave 560ms ease-in-out}}</style>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/QQzzZ.github.io/"  class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">zhanqq's Notes</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+      
+        <p class="site-subtitle">天下事有难易乎？为之，则难者亦易矣；不为，则易者亦难矣。</p>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/QQzzZ.github.io/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br />
+            
+            首页
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/QQzzZ.github.io/archives/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br />
+            
+            归档
+          </a>
+        </li>
+      
+
+      
+    </ul>
+  
+
+  
+</nav>
+
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="https://zhanqq2010.github.io/QQzzZ.github.io/2018/01/11/插件开发之360 DroidPlugin源码分析（五）Service预注册占坑/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="QQzzZ">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/QQzzZ.github.io/uploads/avatar.png">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="zhanqq's Notes">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">插件开发之360 DroidPlugin源码分析（五）Service预注册占坑</h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2018-01-11T14:08:33+08:00">
+                2018-01-11
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <p>在了解系统的activity，service，broadcastReceiver的启动过程后，今天将分析下360 DroidPlugin是如何预注册占坑的？本篇文章主要分析Service预注册占坑，Service占了坑后又是什么时候开始瞒天过海欺骗AMS的？先看下Agenda：</p>
+<ul>
+<li><strong>AndroidManifest.xml中概览</strong></li>
+<li><strong>Service中关键方法被hook时机</strong></li>
+<li><strong>startService被hook</strong></li>
+<li><strong>瞒天过海流程图</strong></li>
+<li><strong>认识ServiceManager</strong></li>
+</ul>
+<p>##AndroidMainfest.xml中概览</p>
+<p><img src="http://img.blog.csdn.net/20160821023438578" alt="这里写图片描述"></p>
+<p>android:process=”:PluginP02” 表示自定义一个名为PluginP02的进程，该属性一旦设置, 那么App启动之后, Service肯定会以远程服务方式启动, —- 可通过adb shell ps 就可以看到有一个独立的进程启动了.</p>
+<p>项目 Package为 com.morgoo.droidplugin , 并设置 android:process=”:PluginP02”, 那么App运行时, 通过 adb shell ps | grep com.morgoo.droidplugin , 可以看到有两个进程:</p>
+<p><img src="http://img.blog.csdn.net/20160821025123414" alt="这里写图片描述"></p>
+<p>##startService被hook</p>
+<p>IActivityManagerHookHandle.startService方法</p>
+<p><img src="http://img.blog.csdn.net/20160821025156117" alt="这里写图片描述"></p>
+<p>replaceFirstServiceIntentOfArgs()</p>
+<p><img src="http://img.blog.csdn.net/20160821025222023" alt="这里写图片描述"></p>
+<p>接下来我们继续回到StartService类中，看下afterInvoke方法</p>
+<p><img src="http://img.blog.csdn.net/20160821025241211" alt="这里写图片描述"></p>
+<p>stopService,bindService,unbindService，setServiceForeground都是类似逻辑，可从源码中证实。<br>在前一篇<a href="http://blog.csdn.net/hejjunlin/article/details/52258434" target="_blank" rel="noopener">《插件开发之360 DroidPlugin源码分析（四）Activity预注册占坑》</a>，我们曾了解到，8个进程中的service在预注册占坑，在AndroidManifest.xml中只有一个，那如果插件要启动多个service怎么办？这是第一个问题，而我们知道所有和服务相关的都要在系统的systemServer进程中进行注册，难道DroidPlugin要逆天的本事？这是第二个问题<br>我们从代码中发现有一个ServceManager，这和android系统中大管家ServiceManager相差一个i，难道要改大管家的职责？又多了一个疑惑<br>仔细看了下ServceManager中的代码：</p>
+<p><img src="http://img.blog.csdn.net/20160821025303415" alt="这里写图片描述"><br><img src="http://img.blog.csdn.net/20160821025323853" alt="这里写图片描述"><br><img src="http://img.blog.csdn.net/20160821025349024" alt="这里写图片描述"></p>
+<p>以上代码可总结为：（以虚线分上下两部分）<br>1.上部分主要是ServceManager单例及有一个handleXXX相关的方法，下部分主要是Service的一些生命周期方法。<br>2.我们基本可以确定之前问题2和问题3的答案了，没有那么逆天的本事来操作ServiceManager，也不能修改大管家ServiceManager的职责<br>3.那问题又来了，这个类到底是做啥的？还起一个叫ServceManager的名字，<br>以hanldeOnTaskRemoveOne方法为例看看：</p>
+<p><img src="http://img.blog.csdn.net/20160821025410931" alt="这里写图片描述"></p>
+<p>接着再看下ServceManager中的onBind方法：</p>
+<p><img src="http://img.blog.csdn.net/20160821025431244" alt="这里写图片描述"></p>
+<p>然后调到handleOnBindOne方法中，我们前面分析了一个handleOnTaskRemovedOne方法，下面1-7步骤套路都是一样，主要在return时，直接调用service自身的onBind了，这和我们平时在Activity中new Intent,然后把这个intent传到onBind中.</p>
+<p><img src="http://img.blog.csdn.net/20160821025448183" alt="这里写图片描述"></p>
+<p>那么问题来了，还要这么一个类倒腾来干啥呢？还记得上面有一处逻辑service为null时，就调用了handleCreateServiceOne，好戏在这里：</p>
+<p><img src="http://img.blog.csdn.net/20160821025514512" alt="这里写图片描述"><br><img src="http://img.blog.csdn.net/20160821025554495" alt="这里写图片描述"></p>
+<p>看了上面的分析后，我们再去回想第一个问题，那如果插件要启动多个service怎么办？不知道不没有注意到mTokenServices，mNameService，mServiceTaskIds这些成员变量，它们都是Map，key不一样，value全是Service，如个有多个service在插件中启动了，mTokenServices，mNameService，mServiceTaskIds这些成员变量分别掌握了Service的Token,name，及任务id（通过token拿到的）。那岂不是已经在管理这些多个service了。至于附属于这个类起的名字，叫什么都无所谓。<br>以上可用如下流程图表示：<br><img src="http://img.blog.csdn.net/20160821033205794" alt="这里写图片描述"></p>
+<p>前面一直有个问题解释的不彻底，就是问题3，ServceManager是否担当了修改系统大管家ServiceManager的职责？接下来，我们就稍微了解下系统大管家ServiceManager是做什么的？（PS: ServiceManager和Binder机制一样，不是一天两个就能研究的清楚的）</p>
+<p>##认识ServiceManager</p>
+<p>Android系统Binder机制的总管是ServiceManager，所有的Server（System Server）都需要向它注册，应用程序需要向其查询相应的服务。平时，我们在studio上的DDMS中调试程序时，下图这个就是ServiceManager</p>
+<p>这里以Java层加入ServiceManager及getService为数据流分析一下。</p>
+<p>复习一下典型的Binder模式,有利于后面的理解：<br>1、客户端通过某种方式得到服务器端的代理对象。从客户端角度看来代理对象和他的本地对象没有什么差别。它可以像其他本地对象一样调用其方法，访问其变量。<br>2、客户端通过调用服务器代理对象的方法向服务器端发送请求。<br>3、代理对象把用户请求通过Android内核（Linux内核）的Binder驱动发送到服务器进程。<br>4、服务器进程处理用户请求，并通过Android内核（Linux内核）的Binder驱动返回处理结果给客户端的服务器代理对象。<br>5、客户端收到服务器端的返回结果。</p>
+<p>JAVA层代码分析：<br>ServiceManager.java (frameworks\base\core\java\android\os)</p>
+<p>对于xxxManager获取服务端service基本如此用法：<br>举例：<br>利用ContextImpl.java中的 public Object getSystemService(String name)</p>
+<p><img src="http://img.blog.csdn.net/20160821025616886" alt="这里写图片描述"></p>
+<p>然后再调用：ServiceManager.getService(ServiceName);获取相应的服务端</p>
+<p><img src="http://img.blog.csdn.net/20160821025639136" alt="这里写图片描述"></p>
+<p>知道了客户端获取一个Service的方法之后，我们回到ServiceManager的服务端：</p>
+<p><img src="http://img.blog.csdn.net/20160821025700683" alt="这里写图片描述"></p>
+<p>BinderInternal.getContextObject() @ BinderInternal.java 是一个native 函数：</p>
+<p>android_os_BinderInternal_getContextObject @ android_util_Binder.cpp<br>返回一个 BinderProxy对象保存到类成员mRemote(ServiceManagerProxy类成员)</p>
+<p>public abstract class ServiceManagerNative extends Binder implements IServiceManager<br>ServiceManagerNative 继承自 Binder 并实现了 IServiceManager 接口，利用 asInterface()则提供一个 ServiceManagerProxy 代理对象使用</p>
+<p>class ServiceManagerProxy implements IServiceManager<br>定义了类ServiceManagerProxy（代理），ServiceManagerProxy继承自IServiceManager，并实现了其声明的操作函数，只会被ServiceManagerNative创建，它实现了IServiceManager的接口，IServiceManager提供了getService和addService两个成员函数来管理系统中的Service。</p>
+<p><img src="http://img.blog.csdn.net/20160821025721230" alt="这里写图片描述"></p>
+<p>上面代码总结如下：Java层先利用Parcel对象将数据进行序列化，然后利用transact将数据传给binder驱动，就是上面mRemote.transact，mRemote在JNI层是一个叫BpBinder的对象：</p>
+<p>JNI层代码分析：<br>android_util_Binder.cpp</p>
+<p><img src="http://img.blog.csdn.net/20160821025737074" alt="这里写图片描述"></p>
+<p>每当我们利用BpBinder的transact()函数发起一次跨进程事务时，其内部其实是调用IPCThreadState对象的transact()。BpBinder的transact()代码如下：</p>
+<p><img src="http://img.blog.csdn.net/20160821025803184" alt="这里写图片描述"></p>
+<p>到此，不再向下深究，具体想了解可以看Binder机制及IPC相关内容。<br>所以，到这把第2个问题彻底弄明白了，ServiceManager和ServiceManager根本不是一回事。到次，Service的瞒天过海得以实现，接着，就是介绍时候说的那样无需修改源码，多进程，多service等功能。另外ContentProvider及BroadCast原理是类似，不再进行分析。<br>下篇将开始分析包管理(宿主插件和插件包名有什么规则)，APK解析（为什么可以免安装），进程管理（能确保隐藏起来，不会在process轻易被kill）</p>
+
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/QQzzZ.github.io/2018/01/11/插件开发之360 DroidPlugin源码分析（四）Activity预注册占坑/" rel="next" title="插件开发之360 DroidPlugin源码分析（四）Activity预注册占坑">
+                <i class="fa fa-chevron-left"></i> 插件开发之360 DroidPlugin源码分析（四）Activity预注册占坑
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/QQzzZ.github.io/2018/01/11/插件开发之360 DroidPlugin源码分析（一）初识/" rel="prev" title="插件开发之360 DroidPlugin源码分析（一）初识">
+                插件开发之360 DroidPlugin源码分析（一）初识 <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+
+  
+
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    
+    <div class="sidebar-inner">
+
+      
+
+      
+
+      <section class="site-overview-wrap sidebar-panel sidebar-panel-active">
+        <div class="site-overview">
+          <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+            
+              <img class="site-author-image" itemprop="image"
+                src="/QQzzZ.github.io/uploads/avatar.png"
+                alt="QQzzZ" />
+            
+              <p class="site-author-name" itemprop="name">QQzzZ</p>
+              <p class="site-description motion-element" itemprop="description">天下事有难易乎？为之，则难者亦易矣；不为，则易者亦难矣。</p>
+          </div>
+
+          <nav class="site-state motion-element">
+
+            
+              <div class="site-state-item site-state-posts">
+              
+                <a href="/QQzzZ.github.io/archives/">
+              
+                  <span class="site-state-item-count">18</span>
+                  <span class="site-state-item-name">日志</span>
+                </a>
+              </div>
+            
+
+            
+
+            
+
+          </nav>
+
+          
+            <div class="feed-link motion-element">
+              <a href="/QQzzZ.github.io/atom.xml" rel="alternate">
+                <i class="fa fa-rss"></i>
+                RSS
+              </a>
+            </div>
+          
+
+          
+
+          
+          
+
+          
+          
+
+          
+
+        </div>
+      </section>
+
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">&copy; <span itemprop="copyrightYear">2018</span>
+  <span class="with-love">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">QQzzZ</span>
+
+  
+</div>
+
+
+  <div class="powered-by">由 <a class="theme-link" target="_blank" href="https://hexo.io">Hexo</a> 强力驱动</div>
+
+
+
+  <span class="post-meta-divider">|</span>
+
+
+
+  <div class="theme-info">主题 &mdash; <a class="theme-link" target="_blank" href="https://github.com/iissnan/hexo-theme-next">NexT.Mist</a> v5.1.4</div>
+
+
+
+
+        
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+    
+
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+    <script type="text/javascript" src="/QQzzZ.github.io/lib/jquery/index.js?v=2.1.3"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/QQzzZ.github.io/lib/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/QQzzZ.github.io/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/QQzzZ.github.io/lib/velocity/velocity.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/QQzzZ.github.io/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/QQzzZ.github.io/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+  
+
+
+  
+
+
+  <script type="text/javascript" src="/QQzzZ.github.io/js/src/utils.js?v=5.1.4"></script>
+
+  <script type="text/javascript" src="/QQzzZ.github.io/js/src/motion.js?v=5.1.4"></script>
+
+
+
+  
+  
+
+  
+  <script type="text/javascript" src="/QQzzZ.github.io/js/src/scrollspy.js?v=5.1.4"></script>
+<script type="text/javascript" src="/QQzzZ.github.io/js/src/post-details.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/QQzzZ.github.io/js/src/bootstrap.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  
+
+
+
+
+	
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+  
+
+  
+
+  
+  
+
+  
+
+  
+
+  
+
+</body>
+</html>

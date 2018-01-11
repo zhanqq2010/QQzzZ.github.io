@@ -1,0 +1,733 @@
+<!DOCTYPE html>
+
+
+
+  
+
+
+<html class="theme-next mist use-motion" lang="zh-Hans">
+<head>
+  <meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+<meta name="theme-color" content="#222">
+
+
+
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/QQzzZ.github.io/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css" />
+
+
+
+
+
+
+
+<link href="/QQzzZ.github.io/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css" />
+
+<link href="/QQzzZ.github.io/css/main.css?v=5.1.4" rel="stylesheet" type="text/css" />
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/QQzzZ.github.io/images/apple-touch-icon-next.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="32x32" href="/QQzzZ.github.io/images/favicon-32x32-next.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="16x16" href="/QQzzZ.github.io/images/favicon-16x16-next.png?v=5.1.4">
+
+
+  <link rel="mask-icon" href="/QQzzZ.github.io/images/logo.svg?v=5.1.4" color="#222">
+
+
+
+
+
+  <meta name="keywords" content="Hexo, NexT" />
+
+
+
+
+
+  <link rel="alternate" href="/QQzzZ.github.io/atom.xml" title="zhanqq's Notes" type="application/atom+xml" />
+
+
+
+
+
+
+<meta name="description" content="在了解系统的activity，service，broadcastReceiver的启动过程后，今天将分析下360 DroidPlugin是如何预注册占坑的？本篇文章主要分析Activity预注册占坑，Activity占了坑后又是什么时候开始瞒天过海欺骗AMS的？先看下Agenda：  AndroidMainfest.xml中概览 Activity中关键方法被hook时机 startActivity">
+<meta property="og:type" content="article">
+<meta property="og:title" content="插件开发之360 DroidPlugin源码分析（四）Activity预注册占坑">
+<meta property="og:url" content="https://zhanqq2010.github.io/2018/01/11/插件开发之360 DroidPlugin源码分析（四）Activity预注册占坑/index.html">
+<meta property="og:site_name" content="zhanqq&#39;s Notes">
+<meta property="og:description" content="在了解系统的activity，service，broadcastReceiver的启动过程后，今天将分析下360 DroidPlugin是如何预注册占坑的？本篇文章主要分析Activity预注册占坑，Activity占了坑后又是什么时候开始瞒天过海欺骗AMS的？先看下Agenda：  AndroidMainfest.xml中概览 Activity中关键方法被hook时机 startActivity">
+<meta property="og:locale" content="zh-Hans">
+<meta property="og:image" content="http://img.blog.csdn.net/20160820022434578">
+<meta property="og:image" content="http://img.blog.csdn.net/20160820022530891">
+<meta property="og:image" content="http://img.blog.csdn.net/20160820022615141">
+<meta property="og:image" content="http://img.blog.csdn.net/20160820022635297">
+<meta property="og:image" content="http://img.blog.csdn.net/20160820022653567">
+<meta property="og:image" content="http://img.blog.csdn.net/20160820022712099">
+<meta property="og:image" content="http://img.blog.csdn.net/20160820022731756">
+<meta property="og:image" content="http://img.blog.csdn.net/20160820023211675">
+<meta property="og:image" content="http://img.blog.csdn.net/20160820023850754">
+<meta property="og:image" content="http://img.blog.csdn.net/20160820023720565">
+<meta property="og:image" content="http://img.blog.csdn.net/20160820024836386">
+<meta property="og:image" content="http://img.blog.csdn.net/20160820024906121">
+<meta property="og:image" content="http://img.blog.csdn.net/20160820025146498">
+<meta property="og:image" content="http://img.blog.csdn.net/20160820025336718">
+<meta property="og:image" content="http://img.blog.csdn.net/20160820041934362">
+<meta property="og:image" content="http://img.blog.csdn.net/20160820030006720">
+<meta property="og:image" content="http://img.blog.csdn.net/20160820030135351">
+<meta property="og:image" content="http://img.blog.csdn.net/20160820030246447">
+<meta property="og:image" content="http://img.blog.csdn.net/20160820030850599">
+<meta property="og:image" content="http://img.blog.csdn.net/20160820031140005">
+<meta property="og:image" content="http://img.blog.csdn.net/20160820031214928">
+<meta property="og:image" content="http://img.blog.csdn.net/20160820031234975">
+<meta property="og:updated_time" content="2018-01-11T06:09:49.737Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="插件开发之360 DroidPlugin源码分析（四）Activity预注册占坑">
+<meta name="twitter:description" content="在了解系统的activity，service，broadcastReceiver的启动过程后，今天将分析下360 DroidPlugin是如何预注册占坑的？本篇文章主要分析Activity预注册占坑，Activity占了坑后又是什么时候开始瞒天过海欺骗AMS的？先看下Agenda：  AndroidMainfest.xml中概览 Activity中关键方法被hook时机 startActivity">
+<meta name="twitter:image" content="http://img.blog.csdn.net/20160820022434578">
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/QQzzZ.github.io/',
+    scheme: 'Mist',
+    version: '5.1.4',
+    sidebar: {"position":"left","display":"post","offset":12,"b2t":false,"scrollpercent":false,"onmobile":false},
+    fancybox: true,
+    tabs: true,
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    duoshuo: {
+      userId: '0',
+      author: '博主'
+    },
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+
+  <link rel="canonical" href="https://zhanqq2010.github.io/2018/01/11/插件开发之360 DroidPlugin源码分析（四）Activity预注册占坑/"/>
+
+
+
+
+
+  <title>插件开发之360 DroidPlugin源码分析（四）Activity预注册占坑 | zhanqq's Notes</title>
+  
+
+
+
+
+
+
+
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail">
+    <div class="headband"></div>
+	<a href="https://github.com/zhanqq2010" class="github-corner" aria-label="View source on Github"><svg width="80" height="80" viewBox="0 0 250 250" style="fill:#151513; color:#fff; position: absolute; top: 0; border: 0; right: 0;" aria-hidden="true"><path d="M0,0 L115,115 L130,115 L142,142 L250,250 L250,0 Z"></path><path d="M128.3,109.0 C113.8,99.7 119.0,89.6 119.0,89.6 C122.0,82.7 120.5,78.6 120.5,78.6 C119.2,72.0 123.4,76.3 123.4,76.3 C127.3,80.9 125.5,87.3 125.5,87.3 C122.9,97.6 130.6,101.9 134.4,103.2" fill="currentColor" style="transform-origin: 130px 106px;" class="octo-arm"></path><path d="M115.0,115.0 C114.9,115.1 118.7,116.5 119.8,115.4 L133.7,101.6 C136.9,99.2 139.9,98.4 142.2,98.6 C133.8,88.0 127.5,74.4 143.8,58.0 C148.5,53.4 154.0,51.2 159.7,51.0 C160.3,49.4 163.2,43.6 171.4,40.1 C171.4,40.1 176.1,42.5 178.8,56.2 C183.1,58.6 187.2,61.8 190.9,65.4 C194.5,69.0 197.7,73.2 200.1,77.6 C213.8,80.2 216.3,84.9 216.3,84.9 C212.7,93.1 206.9,96.0 205.4,96.6 C205.1,102.4 203.0,107.8 198.3,112.5 C181.9,128.9 168.3,122.5 157.7,114.1 C157.9,116.9 156.7,120.9 152.7,124.9 L141.0,136.5 C139.8,137.7 141.6,141.9 141.8,141.8 Z" fill="currentColor" class="octo-body"></path></svg></a><style>.github-corner:hover .octo-arm{animation:octocat-wave 560ms ease-in-out}@keyframes octocat-wave{0%,100%{transform:rotate(0)}20%,60%{transform:rotate(-25deg)}40%,80%{transform:rotate(10deg)}}@media (max-width:500px){.github-corner:hover .octo-arm{animation:none}.github-corner .octo-arm{animation:octocat-wave 560ms ease-in-out}}</style>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/QQzzZ.github.io/"  class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">zhanqq's Notes</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+      
+        <p class="site-subtitle">天下事有难易乎？为之，则难者亦易矣；不为，则易者亦难矣。</p>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/QQzzZ.github.io/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br />
+            
+            首页
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/QQzzZ.github.io/archives/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br />
+            
+            归档
+          </a>
+        </li>
+      
+
+      
+    </ul>
+  
+
+  
+</nav>
+
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="https://zhanqq2010.github.io/QQzzZ.github.io/2018/01/11/插件开发之360 DroidPlugin源码分析（四）Activity预注册占坑/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="QQzzZ">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/QQzzZ.github.io/uploads/avatar.png">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="zhanqq's Notes">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">插件开发之360 DroidPlugin源码分析（四）Activity预注册占坑</h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2018-01-11T14:08:33+08:00">
+                2018-01-11
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <p>在了解系统的activity，service，broadcastReceiver的启动过程后，今天将分析下360 DroidPlugin是如何预注册占坑的？本篇文章主要分析Activity预注册占坑，Activity占了坑后又是什么时候开始瞒天过海欺骗AMS的？先看下Agenda：</p>
+<ul>
+<li><strong>AndroidMainfest.xml中概览</strong></li>
+<li><strong>Activity中关键方法被hook时机</strong></li>
+<li><strong>startActivity被hook</strong></li>
+<li><strong>handelPerformActivity被hook</strong></li>
+<li><strong>Activity预注册占坑整体流程图</strong></li>
+<li><strong>瞒天过海，冒充真实身份，欺骗AMS</strong></li>
+</ul>
+<p>##AndroidMainfest.xml中概览<br>我们知道所有能用的四大组件都要在Manifest中注册声明，第一步，先看AndroidManifest.xml，虽然在说hook机制时，也有提及过，但是毕竟没细致分析，话不多说，看代码上图：</p>
+<p><img src="http://img.blog.csdn.net/20160820022434578" alt="这里写图片描述"></p>
+<p>然后看下各个属性的意思</p>
+<p><img src="http://img.blog.csdn.net/20160820022530891" alt="这里写图片描述"></p>
+<p>表示一个activity1原来属于task1，但是如果task2启动起来的话，activity1可能不再属于task1了，转而投奔task2去了。 </p>
+<p><img src="http://img.blog.csdn.net/20160820022615141" alt="这里写图片描述"></p>
+<p>功能：启动硬件加速<br>缺点：占用内存<br>特点：可以在Application、Activity、Window、View四个级别进行硬件加速控制</p>
+<p>从Android3.0（API Level 11）开始，Android 2D渲染管道能够更好的支持硬件加速。硬件加速执行的所有的绘图操作都是使用GPU在View对象的画布上来进行的。因为启用硬件加速会增加资源的需求，因此这样的应用会占用更多的内存。</p>
+<p>启用硬件加速的最容易的方法是给整个应用程序都打开全局硬件加速功能。如果应用程序只使用标准的View和Drawable，那么打开全局硬件加速不会导致任何的不良的绘制效果。但是，因为硬件加速并不支持所有的2D图形绘制操作，所以对于那些使用定制的View和绘制调用的应用程序来说，打开全局硬件加速，可以会影响绘制效果。问题通常会出现在对那些不可见的元素进行了异常或错误的像素渲染。为了避免这种问题，Android提供以下级别，以便可选择性的启用或禁止硬件加速：</p>
+<p>控制硬件加速，能够用以下级别来控制硬件加速：</p>
+<p>1、Application级别</p>
+<p>在应用的Android清单文件中，把下列属性添加到元素中，来开启整个应用程序的硬件加速。</p>
+<p>2、Activity级别</p>
+<p>如果应用程序不能够正确的使用被打开的全局硬件加速，那么也可以对Activity分别进行控制。在元素中使用android:hardwareAccelerated属性，能够启用或禁止Activity级别的硬件加速。以下示例启用全局的硬件加速，但却禁止了一个Activity的硬件加速。</p>
+<p>3、Window级别</p>
+<p>如果需要更细粒度的控制，就可以使用下列代码来针对给定的窗口来启用硬件加速：</p>
+<p>注意：当前不能在Window级别禁止硬件加速。</p>
+<p><img src="http://img.blog.csdn.net/20160820022635297" alt="这里写图片描述"></p>
+<p>4、View级别</p>
+<p>能够使用下列代码在运行时针对一个独立的View对象来禁止硬件加速：</p>
+<p><img src="http://img.blog.csdn.net/20160820022653567" alt="这里写图片描述"></p>
+<p>注意：当前不能在View级别开启硬件加速。View层除了禁止硬件加速以外，还有其他的功能，更多的相关信息请看本文的“View层”。</p>
+<p><img src="http://img.blog.csdn.net/20160820022712099" alt="这里写图片描述"></p>
+<p><img src="http://img.blog.csdn.net/20160820022731756" alt="这里写图片描述"></p>
+<p>以上就是声明属性的含义说明，作为背景了解即可。重点看下面的分析</p>
+<p><img src="http://img.blog.csdn.net/20160820023211675" alt="这里写图片描述"></p>
+<p>Manifest中注册了8个进程，加上主进程共9个<br>然后第每个进程下面又有26个Activity注册，一个service，一个contentprovider,那么问题来了，搞这么多注册在manifest做什么用？仔细分类：就两类一类是Activity，一类是Dialog，我们知道Dialog是建立在Activity之上的，如果Activity被finish或destory后，就会报出异常：android.view.WindowManager$BadTokenException: Unable to add window — token android.os.BinderProxy@438e7108 is not valid; is your activity running?</p>
+<p>附<a href="http://blog.csdn.net/hejjunlin/article/details/52190050" target="_blank" rel="noopener">《插件占坑，四大组件动态注册前奏（一） 系统Activity的启动流程》</a>（也可点击链接过去看详细过程）的activity的启动时序列图： </p>
+<p><img src="http://img.blog.csdn.net/20160820023850754" alt="这里写图片描述"></p>
+<p><img src="http://img.blog.csdn.net/20160820023720565" alt="这里写图片描述"></p>
+<p>##Activity中关键方法被hook时机<br>其中startActivity()和handleLanchActivity()是被DroidPlugin 要欺骗系统的两个主要方法：</p>
+<p>第一个方法是最被经常使用的startActivity()，hook机制见<a href="http://blog.csdn.net/hejjunlin/article/details/52124397" target="_blank" rel="noopener">《插件开发之360 DroidPlugin源码分析（二）Hook机制》</a>中分析，主要是通过Java的反射机制替换掉IActivityManager全局对象，具体IActivityManagerHookHandle的onInstall()方法如下：</p>
+<p><img src="http://img.blog.csdn.net/20160820024836386" alt="这里写图片描述"><br><img src="http://img.blog.csdn.net/20160820024906121" alt="这里写图片描述"></p>
+<p>第二个方法是handleLaunchActivity()，这个方法属于ActivityThread的一个叫做H的内部类，前面讲Activity启动时，已埋下伏笔，可以参考<a href="http://blog.csdn.net/hejjunlin/article/details/52190050" target="_blank" rel="noopener">《插件占坑，四大组件动态注册前奏（一） 系统Activity的启动流程》</a>，如果学过中间人攻击协议的话，我们知道，现个通信双方发出消息后，进行消息验证，如果中间人拦截相关协议内容，通过一个代理进行转发出去，从而达到欺骗的目的，这里暂且理解handleLanchActivity被中间人攻击了，当启动handleLanchActivity时，被DroidPlugin hook后，那多人可能会想，你怎么hook住hanleLanchActivity呢？别忘了，我们可是在Manifest占了一堆坑的。要是不好理解，可以参看《插件前奏-android黑科技 hook介绍 ：<a href="http://blog.csdn.net/hejjunlin/article/details/52091833》，可能更直观些，哪在DroidPlugin中，如何在代码中瞒天过海的呢？" target="_blank" rel="noopener">http://blog.csdn.net/hejjunlin/article/details/52091833》，可能更直观些，哪在DroidPlugin中，如何在代码中瞒天过海的呢？</a><br>我们可以看下：PluginCallbackHook.java，其中有一个onInstall()方法：</p>
+<p><img src="http://img.blog.csdn.net/20160820025146498" alt="这里写图片描述"></p>
+<p>如上代码也有注释，可总结为：<br>1.DroidPlugin不是完全攻击mH这个内部类，而是把mH的mCallback成员变量攻击了，然后替换成了一个PluginCallback对象，进行消息分发，那么就可以在在PluginCallback的handleMessage()里任意拦截想要分发的消息，来欺骗AMS。经过中间人这么一闹腾，那就能达到控制这个区域的目的了。</p>
+<p>最狠的看下面：<br>上面代码中，有一个mH的mCallback,是被拦截攻击了吧，既然被拦截后又要冒充一个担当mH的mCallback职责相关，（这里暂且夸张的说）那肯定得扒了它身上的某些特性放到冒充的mCallback吧，如身份验证相关之类，所以那原来的mCallback丢了它的身份相关，不就是废了，暂且理解为mCallback为null,实际上有mCallback在未赋值之前，初始化时，本身也是null。然后看下PluginCallback的handleMessage()方法：（ps: PluginCallback简直就是仿照ActivityThread中的H内部类写的，几乎逻辑一样，具体可看系统源码证实）</p>
+<p><img src="http://img.blog.csdn.net/20160820025336718" alt="这里写图片描述"></p>
+<p>这里只拦截了一个消息类型为LAUNCH_ACTIVITY（ActivityThread中的H内部类中会有很多消息类型，也包含LAUNCH_ACTIVITY）。mCallback不为null，就是发一些伪装的消息（因为我们刚拦截了mCallback），如果为null,返回false，这样就会会再通过mH调用回真正ActivityThread的handleLaunchActivity()。（ps:系统发的消息没什么卵用时，我们就不去拦截，暂且理解为这样）</p>
+<p>以上就是两个方法怎么被hook相关分析，也可参考在Hook机制举例为IPackageManager的验证签名被hook的过程，接下来就是要看hook中做了什么事？附一张Activity预注册占坑整体流程图：</p>
+<p><img src="http://img.blog.csdn.net/20160820041934362" alt="这里写图片描述"></p>
+<p>前面我们都是在说DroidPlugin怎么用中间人攻击方式，拦截了startActivity()方法和hanleLanchActivity()方法，接下来要看下拦截了后，怎么把这种身份角色搞变化了（就是一个怎么扮演冒充的角色过程）：<br>1.首先得找一个和真实的人像的角色，这时启用的我们备用人员，也就是事先占的坑stub.ActivityStubxxx。<br>2.真实的角色身上有某些特定的特性，如爱抽烟，头发乱糟糟的，像Activity中Intent作为一个extra传到另一个Activity时，还有一些自己的lanchmode(启动方式)，theme(主题)，这些都是Activity的一些特性，所以stub.ActivityStubxxx也得有这些，否则怎么能达到冒充呢，这些我们在代码中早就写好了，所有的那些注册的26个备用人员都是继承ActivityStub，而ActivityStub是直接继承Activity，那还说啥呢，不就是天然的冒充么？说这么多了，直接看代码IActivityManagerHookHandle$startActvity：<br> 这是一个静态内部类，继承ReplaceCallingPackageHookedMethodHandler，重写了beforeInvoke方法，暂且理解为在冒充之前的一些准备工作，如下：</p>
+<p> <img src="http://img.blog.csdn.net/20160820030006720" alt="这里写图片描述"></p>
+<p>接着再看beforeStartActivity方法：</p>
+<p><img src="http://img.blog.csdn.net/20160820030135351" alt="这里写图片描述"></p>
+<p>就是判断了下Activity的启动模式，接着都调入doFinshIt(mRunningXXXActivityList),继续看此方法：</p>
+<p><img src="http://img.blog.csdn.net/20160820030246447" alt="这里写图片描述"></p>
+<p>STUB_NO_ACTIVITY_MAX_NUM为4，上面方法总结为：runningActivityList（备用activity的list的总数）大于等于3时，就把最早进入activityRecord栈中的那个finish掉，因为坑就那么多，要是都占着不干活，那要它干嘛？ </p>
+<p>##瞒天过海，冒充真实身份，欺骗AMS<br>前面这些，还是小打小闹，接下来看一个核心方法，就是beforeInvoke中的doReplaceIntentForStartActivityAPILow方法：</p>
+<p><img src="http://img.blog.csdn.net/20160820030850599" alt="这里写图片描述"></p>
+<p>前面我们说了，欺骗了两个方法，上面说的都是startActivity（），接下来看另个一个方法handleLanchActivity(), 这个方法在哪呢？我们前面说过有一个仿照ActivityThread中H内部类的class叫PluginCallBack,对，handleLaunchActivity就是在接到handleMessage中消息类型为LANCH_ACTIVITY时调用的：</p>
+<p><img src="http://img.blog.csdn.net/20160820031140005" alt="这里写图片描述"><img src="http://img.blog.csdn.net/20160820031214928" alt="这里写图片描述"><img src="http://img.blog.csdn.net/20160820031234975" alt="这里写图片描述"></p>
+<p>以上就是Activity预注册占坑，并欺骗AMS的过程，下篇分析Service预注册占坑。</p>
+<p>如果你觉得好，随手点赞，也是对笔者的肯定，也可以分享此公众号给你更多的人，原创不易</p>
+
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/QQzzZ.github.io/2018/01/11/插件开发之360 DroidPlugin源码分析（三）Binder代理/" rel="next" title="插件开发之360 DroidPlugin源码分析（三）Binder代理">
+                <i class="fa fa-chevron-left"></i> 插件开发之360 DroidPlugin源码分析（三）Binder代理
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/QQzzZ.github.io/2018/01/11/插件开发之360 DroidPlugin源码分析（五）Service预注册占坑/" rel="prev" title="插件开发之360 DroidPlugin源码分析（五）Service预注册占坑">
+                插件开发之360 DroidPlugin源码分析（五）Service预注册占坑 <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+
+  
+
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    
+    <div class="sidebar-inner">
+
+      
+
+      
+
+      <section class="site-overview-wrap sidebar-panel sidebar-panel-active">
+        <div class="site-overview">
+          <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+            
+              <img class="site-author-image" itemprop="image"
+                src="/QQzzZ.github.io/uploads/avatar.png"
+                alt="QQzzZ" />
+            
+              <p class="site-author-name" itemprop="name">QQzzZ</p>
+              <p class="site-description motion-element" itemprop="description">天下事有难易乎？为之，则难者亦易矣；不为，则易者亦难矣。</p>
+          </div>
+
+          <nav class="site-state motion-element">
+
+            
+              <div class="site-state-item site-state-posts">
+              
+                <a href="/QQzzZ.github.io/archives/">
+              
+                  <span class="site-state-item-count">18</span>
+                  <span class="site-state-item-name">日志</span>
+                </a>
+              </div>
+            
+
+            
+
+            
+
+          </nav>
+
+          
+            <div class="feed-link motion-element">
+              <a href="/QQzzZ.github.io/atom.xml" rel="alternate">
+                <i class="fa fa-rss"></i>
+                RSS
+              </a>
+            </div>
+          
+
+          
+
+          
+          
+
+          
+          
+
+          
+
+        </div>
+      </section>
+
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">&copy; <span itemprop="copyrightYear">2018</span>
+  <span class="with-love">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">QQzzZ</span>
+
+  
+</div>
+
+
+  <div class="powered-by">由 <a class="theme-link" target="_blank" href="https://hexo.io">Hexo</a> 强力驱动</div>
+
+
+
+  <span class="post-meta-divider">|</span>
+
+
+
+  <div class="theme-info">主题 &mdash; <a class="theme-link" target="_blank" href="https://github.com/iissnan/hexo-theme-next">NexT.Mist</a> v5.1.4</div>
+
+
+
+
+        
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+    
+
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+    <script type="text/javascript" src="/QQzzZ.github.io/lib/jquery/index.js?v=2.1.3"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/QQzzZ.github.io/lib/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/QQzzZ.github.io/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/QQzzZ.github.io/lib/velocity/velocity.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/QQzzZ.github.io/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/QQzzZ.github.io/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+  
+
+
+  
+
+
+  <script type="text/javascript" src="/QQzzZ.github.io/js/src/utils.js?v=5.1.4"></script>
+
+  <script type="text/javascript" src="/QQzzZ.github.io/js/src/motion.js?v=5.1.4"></script>
+
+
+
+  
+  
+
+  
+  <script type="text/javascript" src="/QQzzZ.github.io/js/src/scrollspy.js?v=5.1.4"></script>
+<script type="text/javascript" src="/QQzzZ.github.io/js/src/post-details.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/QQzzZ.github.io/js/src/bootstrap.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  
+
+
+
+
+	
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+  
+
+  
+
+  
+  
+
+  
+
+  
+
+  
+
+</body>
+</html>

@@ -81,17 +81,24 @@
 
 
 
-<meta name="description" content="Welcome to Hexo! This is your very first post. Check documentation for more info. If you get any problems when using Hexo, you can find the answer in troubleshooting or you can ask me on GitHub. Quick">
+<meta name="description" content="前言：为什么要了解系统Activity，Service,BroadCastReceiver,ContentProvider的启动流程，这是一个对于即将理解插件中的四大组件动态注册，占坑的前提，如果不了解的话，那么很难了解插件hook哪些东西，又是如何骗过AMS来启动Activity,Service,BroadCastReceiver，ContentProvider？ 本节主要记录系统Service">
 <meta property="og:type" content="article">
-<meta property="og:title" content="Hello World">
-<meta property="og:url" content="https://zhanqq2010.github.io/2018/01/10/hello-world/index.html">
+<meta property="og:title" content="插件占坑，四大组件动态注册前奏（二） 系统Service的启动流程">
+<meta property="og:url" content="https://zhanqq2010.github.io/2018/01/11/插件占坑，四大组件动态注册前奏（二） 系统Service的启动流程/index.html">
 <meta property="og:site_name" content="zhanqq&#39;s Notes">
-<meta property="og:description" content="Welcome to Hexo! This is your very first post. Check documentation for more info. If you get any problems when using Hexo, you can find the answer in troubleshooting or you can ask me on GitHub. Quick">
+<meta property="og:description" content="前言：为什么要了解系统Activity，Service,BroadCastReceiver,ContentProvider的启动流程，这是一个对于即将理解插件中的四大组件动态注册，占坑的前提，如果不了解的话，那么很难了解插件hook哪些东西，又是如何骗过AMS来启动Activity,Service,BroadCastReceiver，ContentProvider？ 本节主要记录系统Service">
 <meta property="og:locale" content="zh-Hans">
-<meta property="og:updated_time" content="2018-01-10T02:20:33.968Z">
+<meta property="og:image" content="http://img.blog.csdn.net/20160814112136868">
+<meta property="og:image" content="http://img.blog.csdn.net/20160814124249549">
+<meta property="og:image" content="http://img.blog.csdn.net/20160814121252748">
+<meta property="og:image" content="http://img.blog.csdn.net/20160814121329312">
+<meta property="og:image" content="http://img.blog.csdn.net/20160814121642240">
+<meta property="og:image" content="http://img.blog.csdn.net/20160814121710224">
+<meta property="og:updated_time" content="2018-01-11T06:12:08.609Z">
 <meta name="twitter:card" content="summary">
-<meta name="twitter:title" content="Hello World">
-<meta name="twitter:description" content="Welcome to Hexo! This is your very first post. Check documentation for more info. If you get any problems when using Hexo, you can find the answer in troubleshooting or you can ask me on GitHub. Quick">
+<meta name="twitter:title" content="插件占坑，四大组件动态注册前奏（二） 系统Service的启动流程">
+<meta name="twitter:description" content="前言：为什么要了解系统Activity，Service,BroadCastReceiver,ContentProvider的启动流程，这是一个对于即将理解插件中的四大组件动态注册，占坑的前提，如果不了解的话，那么很难了解插件hook哪些东西，又是如何骗过AMS来启动Activity,Service,BroadCastReceiver，ContentProvider？ 本节主要记录系统Service">
+<meta name="twitter:image" content="http://img.blog.csdn.net/20160814112136868">
 
 
 
@@ -121,13 +128,13 @@
 
 
 
-  <link rel="canonical" href="https://zhanqq2010.github.io/2018/01/10/hello-world/"/>
+  <link rel="canonical" href="https://zhanqq2010.github.io/2018/01/11/插件占坑，四大组件动态注册前奏（二） 系统Service的启动流程/"/>
 
 
 
 
 
-  <title>Hello World | zhanqq's Notes</title>
+  <title>插件占坑，四大组件动态注册前奏（二） 系统Service的启动流程 | zhanqq's Notes</title>
   
 
 
@@ -235,7 +242,7 @@
   
   
   <div class="post-block">
-    <link itemprop="mainEntityOfPage" href="https://zhanqq2010.github.io/QQzzZ.github.io/2018/01/10/hello-world/">
+    <link itemprop="mainEntityOfPage" href="https://zhanqq2010.github.io/QQzzZ.github.io/2018/01/11/插件占坑，四大组件动态注册前奏（二） 系统Service的启动流程/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
       <meta itemprop="name" content="QQzzZ">
@@ -252,7 +259,7 @@
 
         
         
-          <h1 class="post-title" itemprop="name headline">Hello World</h1>
+          <h1 class="post-title" itemprop="name headline">插件占坑，四大组件动态注册前奏（二） 系统Service的启动流程</h1>
         
 
         <div class="post-meta">
@@ -264,8 +271,8 @@
               
                 <span class="post-meta-item-text">发表于</span>
               
-              <time title="创建于" itemprop="dateCreated datePublished" datetime="2018-01-10T10:20:33+08:00">
-                2018-01-10
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2018-01-11T14:08:33+08:00">
+                2018-01-11
               </time>
             
 
@@ -302,15 +309,28 @@
       
 
       
-        <p>Welcome to <a href="https://hexo.io/" target="_blank" rel="noopener">Hexo</a>! This is your very first post. Check <a href="https://hexo.io/docs/" target="_blank" rel="noopener">documentation</a> for more info. If you get any problems when using Hexo, you can find the answer in <a href="https://hexo.io/docs/troubleshooting.html" target="_blank" rel="noopener">troubleshooting</a> or you can ask me on <a href="https://github.com/hexojs/hexo/issues" target="_blank" rel="noopener">GitHub</a>.</p>
-<h2 id="Quick-Start"><a href="#Quick-Start" class="headerlink" title="Quick Start"></a>Quick Start</h2><h3 id="Create-a-new-post"><a href="#Create-a-new-post" class="headerlink" title="Create a new post"></a>Create a new post</h3><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">$ hexo new <span class="string">"My New Post"</span></span><br></pre></td></tr></table></figure>
-<p>More info: <a href="https://hexo.io/docs/writing.html" target="_blank" rel="noopener">Writing</a></p>
-<h3 id="Run-server"><a href="#Run-server" class="headerlink" title="Run server"></a>Run server</h3><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">$ hexo server</span><br></pre></td></tr></table></figure>
-<p>More info: <a href="https://hexo.io/docs/server.html" target="_blank" rel="noopener">Server</a></p>
-<h3 id="Generate-static-files"><a href="#Generate-static-files" class="headerlink" title="Generate static files"></a>Generate static files</h3><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">$ hexo generate</span><br></pre></td></tr></table></figure>
-<p>More info: <a href="https://hexo.io/docs/generating.html" target="_blank" rel="noopener">Generating</a></p>
-<h3 id="Deploy-to-remote-sites"><a href="#Deploy-to-remote-sites" class="headerlink" title="Deploy to remote sites"></a>Deploy to remote sites</h3><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">$ hexo deploy</span><br></pre></td></tr></table></figure>
-<p>More info: <a href="https://hexo.io/docs/deployment.html" target="_blank" rel="noopener">Deployment</a></p>
+        <p>前言：为什么要了解系统Activity，Service,BroadCastReceiver,ContentProvider的启动流程，这是一个对于即将理解插件中的四大组件动态注册，占坑的前提，如果不了解的话，那么很难了解插件hook哪些东西，又是如何骗过AMS来启动Activity,Service,BroadCastReceiver，ContentProvider？</p>
+<p>本节主要记录系统Service的启动流程：<br>先看时序图：<br><img src="http://img.blog.csdn.net/20160814112136868" alt="这里写图片描述"></p>
+<p>与Activity组件的启动方式很像，Service启动分为隐式和显式两种，对于隐式启动Service组件来说，我们只需要知道它的组件名称，而对于显示的Service组件来说，需要知道它的类名称。<br>以一个后台播放音乐场景来说明：<br>通过实现一个MyService来实现一个异步任务来播放后台音乐</p>
+<p>MyActivity.java<br><img src="http://img.blog.csdn.net/20160814124249549" alt="这里写图片描述"><br><img src="http://img.blog.csdn.net/20160814121252748" alt="这里写图片描述"></p>
+<p>MyService.java<br><img src="http://img.blog.csdn.net/20160814121329312" alt="这里写图片描述"></p>
+<p>MyActivity组件绑定MyService的过程：</p>
+<ul>
+<li><strong>1.MyActivity向ActivityManagerService发送一个绑定CounterService组件的进程间通信请求。</strong></li>
+<li><strong>2.ActivityManagerService发现用来运行MyService组件的应用程序进程即为MyActivity组件所运行的应用程序进程，因此，它就直接通知应用程序进程将MyService启动起来。</strong></li>
+<li><strong>3.MyService组件启动起来后，ActivityManagerService就请求它返回一个Binder本地对象，以便MyActivity可以通过这个Binder本地对象来和MyService组件建立连接。</strong></li>
+<li><strong>4.ActivityManagerService将前面从MyService组件中获得的一个Binder本地对象发送给MyActivity组件。</strong></li>
+<li><strong>5.MyActivity组件获得了ActivityManagerService给它发送的Binder本地对象之后，就可以通过它来获得MyService组件的一个访问接口，MyActivity组件之后就可以通过这个访问接口来使用MyService组件所提供的服务，这就相当于将MyService绑定在了MyActivity中了。</strong></li>
+</ul>
+<p>那service在系统中绑定是如何的呢？<br>同样看下时序图：<br><img src="http://img.blog.csdn.net/20160814121642240" alt="这里写图片描述"></p>
+<p><img src="http://img.blog.csdn.net/20160814121710224" alt="这里写图片描述"></p>
+<p>客户端组件启动Server组件的过程：</p>
+<ul>
+<li><strong>1.Client组件启动ActivityManagerService发送一个启动Server组件的进程间通信请求。</strong></li>
+<li>2.ActivityManagerService发现用来运行Server组件的应用程序进程不存在，因此，它就会首先将Server组件的信息保存下来，接着再<br>创建一个新的应用程序进程 </li>
+<li><strong>3.新的应用程序启动完成之后，就会向ActivityManagerService发送一个启动完成进程间通信请求，以便ActivityManagerServices可以继续执行启动Service组件的操作。</strong></li>
+<li><strong>4.ActitivtyManagerService将2中保存下来的Service组件信息发送级第2步创建的应用程序进程，以便它可以将Server组件启动起来。</strong></li>
+</ul>
 
       
     </div>
@@ -335,15 +355,15 @@
         <div class="post-nav">
           <div class="post-nav-next post-nav-item">
             
+              <a href="/QQzzZ.github.io/2018/01/11/插件开发之360 DroidPlugin源码分析（一）初识/" rel="next" title="插件开发之360 DroidPlugin源码分析（一）初识">
+                <i class="fa fa-chevron-left"></i> 插件开发之360 DroidPlugin源码分析（一）初识
+              </a>
+            
           </div>
 
           <span class="post-nav-divider"></span>
 
           <div class="post-nav-prev post-nav-item">
-            
-              <a href="/QQzzZ.github.io/2018/01/11/概述/" rel="prev" title="Android插件化原理解析——概要">
-                Android插件化原理解析——概要 <i class="fa fa-chevron-right"></i>
-              </a>
             
           </div>
         </div>
@@ -395,17 +415,8 @@
       
 
       
-        <ul class="sidebar-nav motion-element">
-          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
-            文章目录
-          </li>
-          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
-            站点概览
-          </li>
-        </ul>
-      
 
-      <section class="site-overview-wrap sidebar-panel">
+      <section class="site-overview-wrap sidebar-panel sidebar-panel-active">
         <div class="site-overview">
           <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
             
@@ -458,22 +469,6 @@
         </div>
       </section>
 
-      
-      <!--noindex-->
-        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
-          <div class="post-toc">
-
-            
-              
-            
-
-            
-              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#Quick-Start"><span class="nav-number">1.</span> <span class="nav-text">Quick Start</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#Create-a-new-post"><span class="nav-number">1.1.</span> <span class="nav-text">Create a new post</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Run-server"><span class="nav-number">1.2.</span> <span class="nav-text">Run server</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Generate-static-files"><span class="nav-number">1.3.</span> <span class="nav-text">Generate static files</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Deploy-to-remote-sites"><span class="nav-number">1.4.</span> <span class="nav-text">Deploy to remote sites</span></a></li></ol></li></ol></div>
-            
-
-          </div>
-        </section>
-      <!--/noindex-->
       
 
       
